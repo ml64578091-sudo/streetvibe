@@ -68,12 +68,18 @@ class ProductController extends Controller
 
     // --- TAMPILAN UNTUK ADMIN (BACK-END) ---
 
-    public function index()
-    {
-        $products = Product::with(['category', 'brand'])->latest()->get();
-        return view('product.index', compact('products'));
+   public function index(Request $request)
+{
+    $query = Product::query();
+
+    // Menangkap filter ?kategori=baju
+    if ($request->has('kategori')) {
+        $query->where('kategori', $request->kategori);
     }
 
+    $products = $query->get();
+    return view('products', compact('products')); // Sesuaikan dengan nama file view kamu
+}
     public function create()
     {
         $categories = Category::all();

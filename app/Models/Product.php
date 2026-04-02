@@ -2,38 +2,39 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
-
-    // Kolom yang boleh diisi manual
+    // Masukkan semua kolom yang boleh diisi (Fillable)
     protected $fillable = [
         'nama_produk',
-        'category_id',
-        'brand_id',
         'harga',
-        'gambar',
         'deskripsi',
+        'category_id',
         'kategori',
-        'status'    
+        'brand_id',
+        'status',
+        'gambar',
+        'link_shopee' // Tambahkan ini jika sudah migrasi tadi
     ];
 
-    /**
-     * Relasi ke Tabel Category
-     */
+    // Relasi ke Kategori
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Relasi ke Tabel Brand
-     */
+    // Relasi ke Brand
     public function brand()
     {
-        return $this->belongsTo(Brand::class, 'brand_id');
+        return $this->belongsTo(Brand::class);
+    }
+
+    // RELASI KE OUTFITS (Cukup tulis SATU KALI saja)
+    public function outfits()
+    {
+        // Gunakan tabel perantara 'outfit_product'
+        return $this->belongsToMany(Outfit::class, 'outfit_product');
     }
 }
