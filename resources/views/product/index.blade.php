@@ -109,7 +109,7 @@
                                     <td class="ps-4 text-muted fw-semibold" style="font-size:13px;">{{ $loop->iteration }}</td>
                                     <td>
                                         @if($product->gambar)
-                                            <img src="{{ asset('storage/' . $product->gambar) }}"
+                                            <img src="{{ Storage::url($product->gambar) }}"
                                                  alt="{{ $product->nama_produk }}"
                                                  class="rounded-3 shadow-sm"
                                                  style="width:64px; height:64px; object-fit:cover;">

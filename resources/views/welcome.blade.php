@@ -1,265 +1,1026 @@
 <!DOCTYPE html>
-<html lang="zxx" class="no-js">
-
+<html lang="id" class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" href="{{ asset('user/img/fav.png') }}">
     <meta charset="UTF-8">
     <title>StreetVibe — Define Your Style</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('user/css/linearicons.css') }}">
     <link rel="stylesheet" href="{{ asset('user/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('user/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('user/css/main.css') }}">
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; background-color: #fff; }
+        /* ─────────────────────────────── RESET & BASE ─────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --black:   #0a0a0a;
+            --white:   #f5f2ee;
+            --orange:  #ff5c00;
+            --grey:    #8a8680;
+            --light:   #f0ede8;
+            --card-bg: #1a1a1a;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--black);
+            overflow-x: hidden;
+            cursor: none;
+        }
 
-        /* Banner & Buttons */
-        .banner-area { height: 100vh; background: #ffffff; display: flex; align-items: center; position: relative; }
-        .banner-content h1 { font-size: clamp(50px, 8vw, 90px); font-weight: 900; line-height: 0.9; letter-spacing: -3px; margin-bottom: 25px; color: #111; }
-        .banner-content p { font-size: 18px; color: #666; max-width: 450px; }
-        .primary-btn-custom { padding: 15px 40px; border-radius: 50px; background: #000; color: #fff !important; font-weight: 700; transition: 0.4s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); border: none; cursor: pointer; }
-        .primary-btn-custom:hover { background: #ff6c00; transform: translateY(-5px); }
+        /* ─────────────────────────────── CURSOR ─────────────────────────────── */
+        .cursor-dot {
+            width: 8px; height: 8px;
+            background: var(--orange);
+            border-radius: 50%;
+            position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 99999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s;
+        }
+        .cursor-ring {
+            width: 36px; height: 36px;
+            border: 1.5px solid var(--orange);
+            border-radius: 50%;
+            position: fixed; top: 0; left: 0;
+            pointer-events: none; z-index: 99998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.18s ease, width 0.3s, height 0.3s, border-color 0.3s;
+            opacity: 0.7;
+        }
+        body:hover .cursor-ring { opacity: 1; }
+        a, button { cursor: none; }
 
-        /* Sections */
-        .aesthetic-section { padding: 80px 0; background: #fff; }
-        .wide-image-container { position: relative; border-radius: 30px; overflow: hidden; height: 550px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-        .wide-image-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.8s ease; }
-        .overlay-text { position: absolute; bottom: 40px; left: 40px; color: #fff; z-index: 2; }
-        .overlay-text h2 { font-size: 45px; font-weight: 800; font-family: 'Playfair Display', serif; font-style: italic; }
+        /* ─────────────────────────────── NOISE OVERLAY ─────────────────────────────── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 9990; opacity: 0.35;
+        }
 
-        /* Category Card */
-        .category-card { border: none; border-radius: 20px; transition: 0.4s; background: #fbfbfb; padding: 50px 20px; text-align: center; display: block; text-decoration: none !important; }
-        .category-card:hover { background: #000; transform: translateY(-10px); }
-        .category-card:hover h4, .category-card:hover .lnr, .category-card:hover .fa { color: #fff !important; }
-        .category-card h4 { font-weight: 800; color: #222; margin-top: 16px; font-size: 15px; letter-spacing: 1px; }
+        /* ─────────────────────────────── NAVBAR ─────────────────────────────── */
+        .sv-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 22px 40px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(245,242,238,0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            transition: padding 0.4s, background 0.4s;
+        }
+        .sv-nav.scrolled { padding: 14px 40px; }
+        .sv-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px; letter-spacing: 2px;
+            color: var(--black); text-decoration: none;
+        }
+        .sv-logo span { color: var(--orange); }
+        .sv-nav-links { display: flex; gap: 32px; list-style: none; }
+        .sv-nav-links a {
+            font-size: 13px; font-weight: 500; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--black);
+            text-decoration: none; position: relative; padding-bottom: 3px;
+        }
+        .sv-nav-links a::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 0; height: 1.5px; background: var(--orange);
+            transition: width 0.3s ease;
+        }
+        .sv-nav-links a:hover::after { width: 100%; }
+        .sv-cart-btn {
+            position: relative; color: var(--black);
+            font-size: 20px; text-decoration: none;
+            transition: color 0.3s;
+        }
+        .sv-cart-btn:hover { color: var(--orange); }
+        .cart-badge {
+            position: absolute; top: -8px; right: -10px;
+            background: var(--orange); color: #fff;
+            border-radius: 50%; width: 18px; height: 18px;
+            font-size: 10px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
 
-        /* Masonry Grid */
-        .masonry-wrapper { padding: 80px 0; background: #fafafa; }
-        .masonry-columns { column-count: 3; column-gap: 20px; }
-        @media (max-width: 991px) { .masonry-columns { column-count: 2; } }
-        @media (max-width: 575px) { .masonry-columns { column-count: 1; } }
-        .masonry-item { display: inline-block; width: 100%; margin-bottom: 20px; border-radius: 15px; overflow: hidden; position: relative; transition: 0.3s; }
-        .masonry-item img { width: 100%; display: block; filter: grayscale(20%); transition: 0.5s; }
-        .masonry-item:hover img { filter: grayscale(0%); transform: scale(1.05); }
-        .masonry-label { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); color: #fff; padding: 5px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; border-radius: 5px; }
+        /* ─────────────────────────────── HERO ─────────────────────────────── */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding-top: 80px;
+            overflow: hidden;
+        }
+        .hero-left {
+            display: flex; flex-direction: column;
+            justify-content: center;
+            padding: 80px 60px 80px 80px;
+            position: relative;
+        }
+        .hero-eyebrow {
+            font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+            color: var(--orange); font-weight: 600; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .hero-eyebrow::before {
+            content: ''; width: 30px; height: 1.5px; background: var(--orange);
+        }
+        .hero-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(80px, 10vw, 140px);
+            line-height: 0.88;
+            letter-spacing: -1px;
+            color: var(--black);
+            margin-bottom: 30px;
+        }
+        .hero-title em {
+            font-family: 'Playfair Display', serif;
+            color: var(--orange);
+            font-size: 0.65em;
+            display: block;
+        }
+        .hero-desc {
+            font-size: 16px; color: var(--grey);
+            line-height: 1.7; max-width: 380px; margin-bottom: 40px;
+        }
+        .hero-cta {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: var(--black); color: var(--white) !important;
+            padding: 16px 36px;
+            border-radius: 0; font-size: 12px;
+            font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+            text-decoration: none;
+            position: relative; overflow: hidden;
+            transition: color 0.4s;
+        }
+        .hero-cta::before {
+            content: ''; position: absolute; inset: 0;
+            background: var(--orange);
+            transform: translateX(-101%);
+            transition: transform 0.4s cubic-bezier(0.77,0,0.18,1);
+        }
+        .hero-cta:hover::before { transform: translateX(0); }
+        .hero-cta span { position: relative; z-index: 1; }
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 24px; font-size: 11px; color: var(--grey);
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+        .hero-tag::before { content: '✦'; color: var(--orange); }
 
-        /* Vibe Gallery & Products */
-        .vibe-grid-4-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 0 20px; width: 100%; }
-        .vibe-card-small { position: relative; width: 100%; overflow: hidden; border-radius: 15px; background: #fff; }
-        .vibe-card-small img { width: 100%; height: 100%; object-fit: cover; display: block; transition: 0.5s ease; }
-        .vibe-card-small:hover img { transform: scale(1.05); }
-        .gallery-overlay { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: #fff; opacity: 0; transition: 0.3s; }
-        .vibe-card-small:hover .gallery-overlay { opacity: 1; }
-        @media (max-width: 768px) { .vibe-grid-4-col { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; } }
+        .hero-right {
+            background: var(--black);
+            position: relative; overflow: hidden;
+            display: flex; align-items: flex-end;
+        }
+        .hero-right::before {
+            content: 'VIBE';
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 300px; color: rgba(255,255,255,0.03);
+            position: absolute; bottom: -40px; right: -20px;
+            line-height: 1; pointer-events: none; user-select: none;
+        }
+        .hero-img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center top;
+            opacity: 0.85;
+            transition: transform 8s ease;
+        }
+        .hero-right:hover .hero-img { transform: scale(1.04); }
+        .hero-badge {
+            position: absolute; top: 40px; right: 40px;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: var(--orange);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: #fff; text-align: center;
+            animation: spin-badge 12s linear infinite;
+        }
+        .hero-badge-inner {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 28px; line-height: 1;
+        }
+        .hero-badge-sub { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
+        @keyframes spin-badge { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* Cart & Floating elements */
-        .btn-outfit-float { position: fixed; bottom: 30px; right: 30px; background: #ff6c00; color: #fff !important; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 9999; box-shadow: 0 10px 20px rgba(255,108,0,0.3); transition: 0.3s; }
-        .btn-outfit-float:hover { transform: scale(1.1) rotate(15deg); }
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute; bottom: 30px; left: 80px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--grey);
+        }
+        .scroll-line {
+            width: 40px; height: 1px; background: var(--grey);
+            position: relative; overflow: hidden;
+        }
+        .scroll-line::after {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%; background: var(--orange);
+            animation: scroll-anim 2s ease infinite;
+        }
+        @keyframes scroll-anim { to { left: 100%; } }
 
-        .badge-cart { position: absolute; top: -8px; right: -12px; background: #ff6c00; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
-        .btn-add-cart { background:#000; color:#fff; border:none; border-radius:8px; padding: 8px 12px; transition: 0.3s; font-size: 14px; }
-        .btn-add-cart:hover { background:#ff6c00; transform: translateY(-2px); }
+        /* ─────────────────────────────── MARQUEE TICKER ─────────────────────────────── */
+        .ticker {
+            background: var(--orange);
+            padding: 14px 0; overflow: hidden;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        .ticker-track {
+            display: flex; gap: 0;
+            animation: ticker-run 22s linear infinite;
+            width: max-content;
+        }
+        .ticker-item {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px; color: #fff;
+            letter-spacing: 3px;
+            padding: 0 40px; white-space: nowrap;
+        }
+        .ticker-sep { color: rgba(255,255,255,0.4); }
+        @keyframes ticker-run { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* ─────────────────────────────── EDITORIAL STRIP ─────────────────────────────── */
+        .editorial {
+            padding: 100px 0;
+            background: var(--black);
+            position: relative; overflow: hidden;
+        }
+        .editorial-inner {
+            max-width: 1400px; margin: 0 auto;
+            padding: 0 60px;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 80px; align-items: center;
+        }
+        .editorial-img-wrap {
+            position: relative;
+            border-radius: 2px; overflow: hidden;
+            aspect-ratio: 4/5;
+        }
+        .editorial-img-wrap img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+        .editorial-img-wrap:hover img { transform: scale(1.05); }
+        .editorial-img-accent {
+            position: absolute; top: -20px; left: -20px;
+            width: 100px; height: 100px;
+            border: 2px solid var(--orange);
+            border-radius: 2px;
+            pointer-events: none;
+        }
+        .editorial-label {
+            font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+            color: var(--orange); margin-bottom: 20px;
+        }
+        .editorial-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(36px, 4vw, 56px);
+            color: var(--white); line-height: 1.15;
+            margin-bottom: 24px; font-style: italic;
+        }
+        .editorial-body {
+            font-size: 16px; color: #888;
+            line-height: 1.8; margin-bottom: 36px;
+        }
+        .editorial-stats {
+            display: flex; gap: 40px; margin-top: 48px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 36px;
+        }
+        .stat-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px; color: var(--white); line-height: 1;
+        }
+        .stat-num span { color: var(--orange); }
+        .stat-label { font-size: 11px; color: #666; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+        .editorial-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            border: 1px solid var(--orange); color: var(--orange) !important;
+            padding: 14px 32px; font-size: 11px;
+            letter-spacing: 2px; text-transform: uppercase;
+            text-decoration: none; transition: 0.3s;
+            font-weight: 600;
+        }
+        .editorial-btn:hover { background: var(--orange); color: #fff !important; }
+
+        /* ─────────────────────────────── CATEGORIES ─────────────────────────────── */
+        .categories { padding: 100px 0; background: var(--white); }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-eyebrow {
+            font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+            color: var(--orange); margin-bottom: 12px; display: block;
+        }
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(42px, 6vw, 72px);
+            letter-spacing: 2px; line-height: 0.9;
+        }
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            max-width: 1200px; margin: 0 auto;
+            padding: 0 40px;
+        }
+        .cat-card {
+            position: relative; aspect-ratio: 3/4;
+            overflow: hidden; display: block;
+            text-decoration: none !important;
+            background: var(--black);
+        }
+        .cat-card-bg {
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+            transition: transform 0.7s ease, filter 0.5s;
+            filter: brightness(0.4) saturate(0.5);
+        }
+        .cat-card:hover .cat-card-bg {
+            transform: scale(1.08);
+            filter: brightness(0.25) saturate(0);
+        }
+        .cat-card-content {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 28px;
+        }
+        .cat-icon {
+            font-size: 32px; color: var(--orange);
+            margin-bottom: 12px;
+            transform: translateY(10px); opacity: 0.7;
+            transition: transform 0.4s, opacity 0.4s;
+        }
+        .cat-card:hover .cat-icon { transform: translateY(0); opacity: 1; }
+        .cat-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px; color: #fff;
+            letter-spacing: 3px;
+            transform: translateY(5px);
+            transition: transform 0.4s;
+        }
+        .cat-card:hover .cat-name { transform: translateY(0); }
+        .cat-arrow {
+            font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--orange); margin-top: 8px;
+            opacity: 0; transform: translateY(10px);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+        .cat-card:hover .cat-arrow { opacity: 1; transform: translateY(0); }
+        .cat-number {
+            position: absolute; top: 20px; right: 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 13px; color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+        }
+
+        /* ─────────────────────────────── PRODUCTS ─────────────────────────────── */
+        .products-section { padding: 100px 0; background: var(--light); }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            max-width: 1300px; margin: 0 auto;
+            padding: 0 40px;
+        }
+        .product-card {
+            background: var(--white);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.4s ease, box-shadow 0.4s;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 48px rgba(0,0,0,0.12);
+        }
+        .product-img-wrap {
+            position: relative; overflow: hidden;
+            aspect-ratio: 3/4;
+            background: #e8e4de;
+        }
+        .product-img-wrap img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+        .product-card:hover .product-img-wrap img { transform: scale(1.06); }
+        .product-tag {
+            position: absolute; top: 14px; left: 14px;
+            background: var(--orange); color: #fff;
+            font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+            padding: 4px 10px; font-weight: 700;
+        }
+        .product-actions {
+            position: absolute; bottom: -60px; left: 0; right: 0;
+            padding: 14px;
+            background: rgba(10,10,10,0.95);
+            transition: bottom 0.35s cubic-bezier(0.77,0,0.18,1);
+            display: flex; gap: 8px;
+        }
+        .product-card:hover .product-actions { bottom: 0; }
+        .product-info { padding: 18px 18px 20px; }
+        .product-brand {
+            font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--orange); margin-bottom: 4px;
+        }
+        .product-name {
+            font-size: 14px; font-weight: 700; color: var(--black);
+            margin-bottom: 10px; letter-spacing: 0.5px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .product-price {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px; color: var(--black);
+        }
+        .btn-cart {
+            flex: 1; background: var(--orange); color: #fff;
+            border: none; padding: 10px; font-size: 12px;
+            letter-spacing: 1px; text-transform: uppercase;
+            font-weight: 700; transition: background 0.3s;
+        }
+        .btn-cart:hover { background: #e05000; }
+        .btn-wishlist {
+            background: rgba(255,255,255,0.1); color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 14px; font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn-wishlist:hover { background: rgba(255,255,255,0.2); }
+
+        /* ─────────────────────────────── LOOKBOOK / MASONRY ─────────────────────────────── */
+        .lookbook { padding: 100px 0; background: var(--black); }
+        .lookbook .section-title { color: var(--white); }
+        .lookbook-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto;
+            gap: 3px;
+            max-width: 1300px; margin: 0 auto;
+            padding: 0 40px;
+        }
+        .look-item {
+            position: relative; overflow: hidden;
+            background: #111;
+        }
+        .look-item:first-child { grid-row: span 2; }
+        .look-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.6s ease, filter 0.4s;
+            filter: grayscale(30%);
+            min-height: 280px;
+        }
+        .look-item:hover img { transform: scale(1.06); filter: grayscale(0%); }
+        .look-label {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 24px 20px 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+        }
+        .look-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 11px; letter-spacing: 3px; color: var(--orange);
+        }
+        .look-title { font-size: 14px; font-weight: 600; color: #fff; margin-top: 2px; }
+
+        /* ─────────────────────────────── GALLERY / INSTAGRAM ─────────────────────────────── */
+        .gallery-section { padding: 100px 0; background: var(--white); }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+            max-width: 1300px; margin: 0 auto;
+            padding: 0 40px;
+        }
+        .gallery-item {
+            aspect-ratio: 1/1; position: relative; overflow: hidden;
+            background: var(--light);
+        }
+        .gallery-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .gallery-item:hover img { transform: scale(1.08); }
+        .gallery-hover {
+            position: absolute; inset: 0;
+            background: rgba(255,92,0,0.85);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.4s;
+            color: #fff;
+        }
+        .gallery-item:hover .gallery-hover { opacity: 1; }
+        .gallery-hover i { font-size: 28px; margin-bottom: 8px; }
+        .gallery-hover p { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+
+        /* ─────────────────────────────── ALERT ─────────────────────────────── */
+        .sv-alert {
+            position: fixed; top: 90px; right: 24px;
+            background: var(--black); color: var(--white);
+            padding: 16px 24px; border-radius: 2px;
+            border-left: 3px solid var(--orange);
+            font-size: 14px; z-index: 9000;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            animation: slide-in 0.4s ease forwards;
+        }
+        @keyframes slide-in { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+
+        /* ─────────────────────────────── FLOAT CTA ─────────────────────────────── */
+        .btn-outfit-float {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--black); color: #fff !important;
+            width: 58px; height: 58px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; z-index: 9000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            text-decoration: none;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .btn-outfit-float:hover {
+            background: var(--orange);
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        /* ─────────────────────────────── FOOTER ─────────────────────────────── */
+        .sv-footer {
+            background: var(--black);
+            padding: 80px 0 40px;
+        }
+        .footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            padding: 0 60px;
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+        }
+        .footer-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px; letter-spacing: 2px;
+            color: var(--white); margin-bottom: 16px;
+        }
+        .footer-logo span { color: var(--orange); }
+        .footer-desc { font-size: 13px; color: #666; line-height: 1.8; }
+        .footer-col h6 {
+            font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+            color: var(--orange); margin-bottom: 20px; font-weight: 700;
+        }
+        .footer-col a {
+            display: block; color: #666; text-decoration: none;
+            font-size: 14px; margin-bottom: 10px;
+            transition: color 0.3s;
+        }
+        .footer-col a:hover { color: var(--white); }
+        .footer-bottom {
+            max-width: 1200px; margin: 60px auto 0;
+            padding: 20px 60px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-bottom p { font-size: 12px; color: #444; letter-spacing: 1px; }
+        .footer-socials { display: flex; gap: 16px; }
+        .footer-socials a { color: #444; font-size: 15px; transition: color 0.3s; }
+        .footer-socials a:hover { color: var(--orange); }
+
+        /* ─────────────────────────────── PAGE LOAD ANIMATION ─────────────────────────────── */
+        .page-loader {
+            position: fixed; inset: 0; z-index: 99999;
+            background: var(--black);
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; gap: 16px;
+            transition: opacity 0.6s, visibility 0.6s;
+        }
+        .page-loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 52px; letter-spacing: 4px; color: var(--white);
+        }
+        .loader-logo span { color: var(--orange); }
+        .loader-bar-wrap {
+            width: 200px; height: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+        .loader-bar {
+            height: 100%; background: var(--orange);
+            width: 0%; animation: load-progress 1.2s ease forwards;
+        }
+        @keyframes load-progress { to { width: 100%; } }
+
+        /* ─────────────────────────────── RESPONSIVE ─────────────────────────────── */
+        @media (max-width: 991px) {
+            .hero { grid-template-columns: 1fr; min-height: auto; }
+            .hero-left { padding: 120px 30px 60px; }
+            .hero-right { height: 60vw; }
+            .editorial-inner { grid-template-columns: 1fr; gap: 40px; padding: 0 30px; }
+            .categories-grid { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
+            .products-grid { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
+            .lookbook-grid { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
+            .lookbook-grid .look-item:first-child { grid-row: span 1; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); padding: 0 20px; }
+            .footer-inner { grid-template-columns: 1fr 1fr; padding: 0 30px; }
+            .sv-nav { padding: 18px 24px; }
+            .sv-nav-links { display: none; }
+            .scroll-hint { display: none; }
+        }
+        @media (max-width: 575px) {
+            .categories-grid, .products-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-inner { grid-template-columns: 1fr; }
+            .hero-title { font-size: 70px; }
+        }
     </style>
 </head>
-
 <body>
 
-    <header class="header_area sticky-header">
-        <div class="main_menu">
-            <nav class="navbar navbar-expand-lg navbar-light main_box">
-                <div class="container d-flex justify-content-between align-items-center">
-                    <a class="navbar-brand logo_h" href="{{ url('/') }}">
-                        <h3 style="font-weight: 900; letter-spacing: -1px; margin:0;">STREET<span style="color:#ff6c00">VIBE.</span></h3>
-                    </a>
+<!-- LOADER -->
+<div class="page-loader" id="loader">
+    <div class="loader-logo">STREET<span>VIBE.</span></div>
+    <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
 
-                    {{-- Ikon Keranjang di Navbar --}}
-                    <div>
-                        <a href="{{ route('cart.index') }}" style="position: relative; color: #111; font-size: 22px;">
-                            <span class="lnr lnr-cart"></span>
-                            @php $cart = session('cart'); @endphp
-                            @if($cart && count($cart) > 0)
-                                <span class="badge-cart">{{ count($cart) }}</span>
-                            @endif
-                        </a>
-                    </div>
-                </div>
-            </nav>
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ═══════════════════════════════════════ NAVBAR ═══════════════════════════════════════ -->
+<nav class="sv-nav" id="svNav">
+    <a href="{{ url('/') }}" class="sv-logo">STREET<span>VIBE.</span></a>
+    <ul class="sv-nav-links">
+        <li><a href="#products-section">Produk</a></li>
+        <li><a href="#lookbook">Lookbook</a></li>
+        <li><a href="{{ route('user.outfits.index') }}">Outfits</a></li>
+        <li><a href="#gallery">Instagram</a></li>
+    </ul>
+    <a href="{{ route('cart.index') }}" class="sv-cart-btn">
+        <span class="lnr lnr-cart"></span>
+        @php $cart = session('cart'); @endphp
+        @if($cart && count($cart) > 0)
+            <span class="cart-badge">{{ count($cart) }}</span>
+        @endif
+    </a>
+</nav>
+
+<!-- ALERT -->
+@if(session('success'))
+<div class="sv-alert" id="svAlert">
+    <i class="fa fa-check-circle" style="color: var(--orange);"></i>
+    {{ session('success') }}
+</div>
+@endif
+
+<!-- ═══════════════════════════════════════ HERO ═══════════════════════════════════════ -->
+<section class="hero">
+    <div class="hero-left">
+        <div class="hero-eyebrow">Collection 2026</div>
+        <h1 class="hero-title">
+            STREET<br>
+            <em>"Artistry"</em>
+            CULTURE
+        </h1>
+        <p class="hero-desc">Lebih dari sekadar pakaian — ini adalah pernyataan tentang siapa dirimu di tengah keramaian kota.</p>
+        <div>
+            <a class="hero-cta" href="#products-section">
+                <span>Explore Collection</span>
+                <span class="lnr lnr-arrow-right"></span>
+            </a>
         </div>
-    </header>
-
-    {{-- Alert Success --}}
-    @if(session('success'))
-    <div class="container mt-4">
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fa fa-check-circle me-2"></i> {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div class="hero-tag">Free shipping on orders above Rp 500k</div>
+        <div class="scroll-hint">
+            <div class="scroll-line"></div>
+            Scroll to discover
         </div>
     </div>
-    @endif
+    <div class="hero-right">
+        <img class="hero-img" src="{{ asset('img/convers.png') }}" alt="Hero Image">
+        <div class="hero-badge">
+            <div class="hero-badge-inner">NEW</div>
+            <div class="hero-badge-sub">Drop</div>
+        </div>
+    </div>
+</section>
 
-    <section class="banner-area">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div class="banner-content">
-                        <h1>STREET<br>ARTISTRY.</h1>
-                        <p>Lebih dari sekadar pakaian. Ini adalah pernyataan tentang siapa dirimu di tengah keramaian kota.</p>
-                        <div class="mt-4">
-                            <a class="primary-btn-custom" href="#products-section">Start Curating <span class="lnr lnr-arrow-right"></span></a>
-                        </div>
-                    </div>
+<!-- ═══════════════════════════════════════ TICKER ═══════════════════════════════════════ -->
+<div class="ticker">
+    <div class="ticker-track">
+        @foreach(range(1,2) as $i)
+        <span class="ticker-item">STREETWEAR</span>
+        <span class="ticker-item ticker-sep">✦</span>
+        <span class="ticker-item">URBAN CULTURE</span>
+        <span class="ticker-item ticker-sep">✦</span>
+        <span class="ticker-item">LIMITED DROPS</span>
+        <span class="ticker-item ticker-sep">✦</span>
+        <span class="ticker-item">FREE SHIPPING</span>
+        <span class="ticker-item ticker-sep">✦</span>
+        <span class="ticker-item">NEW COLLECTION 2026</span>
+        <span class="ticker-item ticker-sep">✦</span>
+        <span class="ticker-item">DEFINE YOUR VIBE</span>
+        <span class="ticker-item ticker-sep">✦</span>
+        @endforeach
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════ EDITORIAL ═══════════════════════════════════════ -->
+<section class="editorial">
+    <div class="editorial-inner">
+        <div style="position: relative;">
+            <div class="editorial-img-wrap">
+                <div class="editorial-img-accent"></div>
+                <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=900&q=80" alt="Editorial">
+            </div>
+        </div>
+        <div>
+            <p class="editorial-label">✦ Trend 2026</p>
+            <h2 class="editorial-title">"Style is a way to say who you are without having to speak."</h2>
+            <p class="editorial-body">Setiap koleksi kami lahir dari riset mendalam tentang budaya jalanan dunia — dari Tokyo hingga New York, dari Jakarta hingga London. Ini bukan fashion biasa.</p>
+            <a href="#products-section" class="editorial-btn">
+                Lihat Koleksi <span class="lnr lnr-arrow-right"></span>
+            </a>
+            <div class="editorial-stats">
+                <div>
+                    <div class="stat-num">200<span>+</span></div>
+                    <div class="stat-label">Products</div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="banner-img">
-                        <img class="img-fluid" src="{{ asset('img/convers.png') }}" alt="Hero Image" style="filter: drop-shadow(0 30px 50px rgba(0,0,0,0.2));">
-                    </div>
+                <div>
+                    <div class="stat-num">50<span>+</span></div>
+                    <div class="stat-label">Brands</div>
+                </div>
+                <div>
+                    <div class="stat-num">10k<span>+</span></div>
+                    <div class="stat-label">Customers</div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="aesthetic-section">
-        <div class="container">
-            <div class="wide-image-container">
-                <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1350&q=80" alt="Wide View">
-                <div class="overlay-text">
-                    <p style="letter-spacing: 3px; text-transform: uppercase; font-size: 12px; font-weight: 700;">Trend 2026</p>
-                    <h2>"Style is a way to say who you are <br>without having to speak."</h2>
+<!-- ═══════════════════════════════════════ CATEGORIES ═══════════════════════════════════════ -->
+<section class="categories" id="products-section">
+    <div class="section-header">
+        <span class="section-eyebrow">Shop by Category</span>
+        <h2 class="section-title">THE ESSENTIALS</h2>
+    </div>
+    <div class="categories-grid">
+        <a href="{{ url('/products?kategori=jacket') }}" class="cat-card">
+            <div class="cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1551537482-f2075a1d41f2?auto=format&fit=crop&w=600&q=80');"></div>
+            <div class="cat-card-content">
+                <div class="cat-number">01</div>
+                <span class="cat-icon fa fa-archive"></span>
+                <div class="cat-name">JACKET</div>
+                <div class="cat-arrow">Shop Now →</div>
+            </div>
+        </a>
+        <a href="{{ url('/products?kategori=baju') }}" class="cat-card">
+            <div class="cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=600&q=80');"></div>
+            <div class="cat-card-content">
+                <div class="cat-number">02</div>
+                <span class="cat-icon lnr lnr-shirt"></span>
+                <div class="cat-name">UPPERWEAR</div>
+                <div class="cat-arrow">Shop Now →</div>
+            </div>
+        </a>
+        <a href="{{ url('/products?kategori=celana') }}" class="cat-card">
+            <div class="cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=600&q=80');"></div>
+            <div class="cat-card-content">
+                <div class="cat-number">03</div>
+                <span class="cat-icon lnr lnr-layers"></span>
+                <div class="cat-name">BOTTOMWEAR</div>
+                <div class="cat-arrow">Shop Now →</div>
+            </div>
+        </a>
+        <a href="{{ url('/products?kategori=sepatu') }}" class="cat-card">
+            <div class="cat-card-bg" style="background-image: url('https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80');"></div>
+            <div class="cat-card-content">
+                <div class="cat-number">04</div>
+                <span class="cat-icon lnr lnr-map"></span>
+                <div class="cat-name">FOOTWEAR</div>
+                <div class="cat-arrow">Shop Now →</div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════ PRODUCTS ═══════════════════════════════════════ -->
+<section class="products-section">
+    <div class="section-header">
+        <span class="section-eyebrow">Fresh Arrivals</span>
+        <h2 class="section-title">LATEST DROPS</h2>
+    </div>
+    <div class="products-grid">
+        @forelse($products as $product)
+        <div class="product-card">
+            <div class="product-img-wrap">
+                <div class="product-tag">New</div>
+               <a href="{{ route('products.show', $product->id) }}">
+                   <img src="{{ asset('storage/' . $product->gambar) }}" alt="denim">
+                    
+                </a>
+                <div class="product-actions">
+                    <form action="{{ route('cart.add', $product->id) }}" method="POST" style="flex:1; display:flex;">
+                        @csrf
+                        <button type="submit" class="btn-cart">
+                            <span class="lnr lnr-cart"></span> Add to Cart
+                        </button>
+                    </form>
+                    <a href="{{ route('products.show', $product->id) }}" class="btn-wishlist">
+                        <span class="lnr lnr-eye"></span>
+                    </a>
                 </div>
-                <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(transparent, rgba(0,0,0,0.6));"></div>
+            </div>
+            <div class="product-info">
+                <div class="product-brand">StreetVibe</div>
+                <div class="product-name">{{ strtoupper($product->nama_produk) }}</div>
+                <div class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</div>
             </div>
         </div>
-    </section>
+        @empty
+        <div style="grid-column: 1/-1; text-align:center; padding: 60px 0; color: var(--grey);">
+            <p style="font-size:16px;">Belum ada produk yang tersedia.</p>
+        </div>
+        @endforelse
+    </div>
+</section>
 
-    {{-- KATEGORI --}}
-    <section id="products-section" class="section_gap_bottom" style="padding-top: 80px;">
-        <div class="container">
-            <div class="row justify-content-center mb-5">
-                <div class="col-lg-8 text-center">
-                    <h2 style="font-weight: 900; font-size: 40px; letter-spacing: -1px;">THE ESSENTIALS</h2>
-                    <p class="text-muted">Pilih kategori favoritmu dan temukan koleksi terbaik.</p>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-3 col-md-6 mb-4"><a href="{{ url('/products?kategori=jacket') }}" class="category-card"><span class="fa fa-archive" style="font-size: 55px; color: #ff6c00;"></span><h4>JACKET</h4></a></div>
-                <div class="col-lg-3 col-md-6 mb-4"><a href="{{ url('/products?kategori=baju') }}" class="category-card"><span class="lnr lnr-shirt" style="font-size: 55px; color: #ff6c00;"></span><h4>UPPERWEAR</h4></a></div>
-                <div class="col-lg-3 col-md-6 mb-4"><a href="{{ url('/products?kategori=celana') }}" class="category-card"><span class="lnr lnr-layers" style="font-size: 55px; color: #ff6c00;"></span><h4>BOTTOMWEAR</h4></a></div>
-                <div class="col-lg-3 col-md-6 mb-4"><a href="{{ url('/products?kategori=sepatu') }}" class="category-card"><span class="lnr lnr-map" style="font-size: 55px; color: #ff6c00;"></span><h4>FOOTWEAR</h4></a></div>
+<!-- ═══════════════════════════════════════ LOOKBOOK ═══════════════════════════════════════ -->
+<section class="lookbook" id="lookbook">
+    <div class="section-header" style="padding: 0 40px; text-align:left; margin-bottom: 48px; max-width: 1300px; margin-left: auto; margin-right: auto;">
+        <span class="section-eyebrow">✦ Visual Stories</span>
+        <h2 class="section-title" style="color: var(--white);">STREET<br>LOOKBOOK</h2>
+    </div>
+    <div class="lookbook-grid">
+        <div class="look-item">
+            <img src="{{ asset('img/2.jpeg') }}" alt="Look 01">
+            <div class="look-label"><div class="look-num">VIBE 01</div><div class="look-title">Urban Warrior</div></div>
+        </div>
+        <div class="look-item">
+            <img src="{{ asset('img/3.jpeg') }}" alt="Look 02">
+            <div class="look-label"><div class="look-num">VIBE 02</div><div class="look-title">Street Minimal</div></div>
+        </div>
+        <div class="look-item">
+            <img src="{{ asset('img/4.jpeg') }}" alt="Look 03">
+            <div class="look-label"><div class="look-num">VIBE 03</div><div class="look-title">City Grunge</div></div>
+        </div>
+        <div class="look-item">
+            <img src="{{ asset('img/8.jpeg') }}" alt="Look 04">
+            <div class="look-label"><div class="look-num">VIBE 04</div><div class="look-title">Monochrome Days</div></div>
+        </div>
+        <div class="look-item">
+            <img src="{{ asset('img/6.jpeg') }}" alt="Look 05">
+            <div class="look-label"><div class="look-num">VIBE 05</div><div class="look-title">Off-Duty Mode</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════ GALLERY ═══════════════════════════════════════ -->
+<section class="gallery-section" id="gallery">
+    <div class="section-header">
+        <span class="section-eyebrow">
+            <a href="https://www.instagram.com/jeoujo_/" target="_blank" style="color: var(--orange); text-decoration:none;">@jeoujo_</a>
+        </span>
+        <h2 class="section-title">FOLLOW<br>THE VIBE</h2>
+    </div>
+    <div class="gallery-grid">
+        @foreach($galleryPhotos as $photo)
+        <div class="gallery-item">
+            <img src="{{ Storage::url($photo->foto) }}" alt="{{ $photo->caption }}">
+            <div class="gallery-hover">
+                <i class="fa fa-instagram"></i>
+                <p>{{ $photo->caption }}</p>
             </div>
         </div>
-    </section>
+        @endforeach
+    </div>
+</section>
 
-    {{-- PRODUK DARI DATABASE (DENGAN TOMBOL ADD TO CART) --}}
-    <section class="section_gap_bottom" style="background: #fff;">
-        <div class="container">
-            <div class="row justify-content-center mb-5">
-                <div class="col-lg-8 text-center">
-                    <h2 style="font-weight: 900; font-size: 40px; letter-spacing: -1px;">LATEST DROPS</h2>
-                    <p class="text-muted">Koleksi terbaru yang baru saja mendarat di katalog kami.</p>
-                </div>
-            </div>
-            <div class="row">
-                @forelse($products as $product)
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <div class="vibe-card-small">
-                        {{-- Gambar Produk --}}
-                        <a href="{{ route('products.show', $product->id) }}" style="display:block; aspect-ratio:3/4;">
-                            <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_produk }}">
-                        </a>
+<!-- FLOAT BTN -->
+<a href="{{ route('user.outfits.index') }}" class="btn-outfit-float" title="Build Outfit">
+    <span class="lnr lnr-shirt"></span>
+</a>
 
-                        {{-- Info & Action --}}
-                        <div style="padding: 15px 0;">
-                            <a href="{{ route('products.show', $product->id) }}" style="text-decoration: none;">
-                                <h6 style="font-weight: 800; color: #111; margin: 0; font-size: 14px;">{{ strtoupper($product->nama_produk) }}</h6>
-                            </a>
-
-                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                <p style="color: #ff6c00; font-weight: 700; margin: 0;">Rp {{ number_format($product->harga, 0, ',', '.') }}</p>
-
-                                {{-- Form Add To Cart --}}
-                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn-add-cart" title="Add to Cart">
-                                        <span class="lnr lnr-cart"></span>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <div class="col-12 text-center">
-                    <p class="text-muted">Belum ada produk yang tersedia.</p>
-                </div>
-                @endforelse
-            </div>
+<!-- ═══════════════════════════════════════ FOOTER ═══════════════════════════════════════ -->
+<footer class="sv-footer">
+    <div class="footer-inner">
+        <div>
+            <div class="footer-logo">STREET<span>VIBE.</span></div>
+            <p class="footer-desc">Streetwear yang lahir dari budaya urban — dibuat untuk mereka yang berani tampil beda di tengah keramaian kota.</p>
         </div>
-    </section>
-
-    {{-- MASONRY (STATIS) --}}
-    <section class="masonry-wrapper">
-        <div class="container">
-            <div class="row mb-5">
-                <div class="col-12 text-left">
-                    <h1 style="font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic;">Street Lookbook</h1>
-                    <p class="text-muted">Inspirasi gaya tak terbatas untuk harimu.</p>
-                </div>
-            </div>
-            <div class="masonry-columns">
-                <div class="masonry-item"><div class="masonry-label">Vibe 01</div><img src="{{ asset('img/2.jpeg') }}" alt="Vibe 1"></div>
-                <div class="masonry-item"><div class="masonry-label">Vibe 02</div><img src="{{ asset('img/3.jpeg') }}" alt="Vibe 2"></div>
-                <div class="masonry-item"><div class="masonry-label">Vibe 03</div><img src="{{ asset('img/4.jpeg') }}" alt="Vibe 3"></div>
-                <div class="masonry-item"><div class="masonry-label">Vibe 04</div><img src="{{ asset('img/8.jpeg') }}" alt="Vibe 4"></div>
-                <div class="masonry-item"><div class="masonry-label">Vibe 05</div><img src="{{ asset('img/6.jpeg') }}" alt="Vibe 5"></div>
-                <div class="masonry-item"><div class="masonry-label">Vibe 06</div><img src="{{ asset('img/7.jpeg') }}" alt="Vibe 6"></div>
-            </div>
+        <div class="footer-col">
+            <h6>Shop</h6>
+            <a href="{{ url('/products?kategori=jacket') }}">Jacket</a>
+            <a href="{{ url('/products?kategori=baju') }}">Upperwear</a>
+            <a href="{{ url('/products?kategori=celana') }}">Bottomwear</a>
+            <a href="{{ url('/products?kategori=sepatu') }}">Footwear</a>
         </div>
-    </section>
-
-    {{-- GALLERY DARI DATABASE --}}
-    <section style="padding: 100px 0; background: #fff;">
-        <div class="container text-center mb-5">
-            <h6 style="letter-spacing: 5px; color: #ff6c00; font-weight: 800;">
-                <a href="https://www.instagram.com/jeoujo_/" target="_blank" style="color: #ff6c00; text-decoration: none;">@jeoujo_</a>
-            </h6>
-            <h2 style="font-weight: 900;">FOLLOW THE OWN</h2>
+        <div class="footer-col">
+            <h6>Info</h6>
+            <a href="#">About Us</a>
+            <a href="#">Lookbook</a>
+            <a href="#">Size Guide</a>
+            <a href="#">FAQ</a>
         </div>
-        <div class="vibe-grid-4-col">
-            @foreach($galleryPhotos as $photo)
-            <div class="vibe-card-small" style="aspect-ratio: 1/1;">
-                <img src="{{ asset('storage/' . $photo->foto) }}" alt="Gallery Image">
-                <div class="gallery-overlay">
-                    <p style="font-size: 12px; margin: 0; font-weight: 600;">{{ $photo->caption }}</p>
-                </div>
-            </div>
-            @endforeach
+        <div class="footer-col">
+            <h6>Contact</h6>
+            <a href="#">support@streetvibe.id</a>
+            <a href="#">WhatsApp</a>
+            <a href="https://www.instagram.com/jeoujo_/" target="_blank">Instagram</a>
         </div>
-    </section>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2026 STREETVIBE. ALL RIGHTS RESERVED.</p>
+        <div class="footer-socials">
+            <a href="#"><i class="fa fa-instagram"></i></a>
+            <a href="#"><i class="fa fa-twitter"></i></a>
+            <a href="#"><i class="fa fa-tiktok"></i></a>
+        </div>
+    </div>
+</footer>
 
-    <a href="{{ route('user.outfits.index') }}" class="btn-outfit-float">
-        <span class="lnr lnr-shirt"></span>
-    </a>
+<script src="{{ asset('user/js/vendor/jquery-2.2.4.min.js') }}"></script>
+<script src="{{ asset('user/js/vendor/bootstrap.min.js') }}"></script>
+<script>
+    // ── Loader ──
+    window.addEventListener('load', function () {
+        setTimeout(function () {
+            document.getElementById('loader').classList.add('hidden');
+        }, 1400);
+    });
 
-    <footer style="padding: 50px 0; background: #000; color: #fff; text-align: center;">
-        <p style="font-size: 12px; opacity: 0.5;">&copy; 2026 STREETVIBE. ALL RIGHTS RESERVED.</p>
-    </footer>
-
-    <script src="{{ asset('user/js/vendor/jquery-2.2.4.min.js') }}"></script>
-    <script src="{{ asset('user/js/vendor/bootstrap.min.js') }}"></script> <script>
-        $(document).ready(function(){
-            $('a[href^="#"]').on('click', function(event) {
-                var target = $(this.getAttribute('href'));
-                if( target.length ) {
-                    event.preventDefault();
-                    $('html, body').stop().animate({ scrollTop: target.offset().top - 80 }, 1000);
-                }
-            });
+    // ── Custom Cursor ──
+    const dot  = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', function (e) {
+        dot.style.left  = e.clientX + 'px';
+        dot.style.top   = e.clientY + 'px';
+        setTimeout(function () {
+            ring.style.left = e.clientX + 'px';
+            ring.style.top  = e.clientY + 'px';
+        }, 60);
+    });
+    document.querySelectorAll('a, button').forEach(function (el) {
+        el.addEventListener('mouseenter', function () {
+            ring.style.width  = '56px';
+            ring.style.height = '56px';
+            ring.style.borderColor = '#ff5c00';
         });
-    </script>
+        el.addEventListener('mouseleave', function () {
+            ring.style.width  = '36px';
+            ring.style.height = '36px';
+            ring.style.borderColor = '#ff5c00';
+        });
+    });
+
+    // ── Navbar scroll ──
+    window.addEventListener('scroll', function () {
+        var nav = document.getElementById('svNav');
+        if (window.scrollY > 60) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
+    });
+
+    // ── Alert auto-dismiss ──
+    var alert = document.getElementById('svAlert');
+    if (alert) {
+        setTimeout(function () {
+            alert.style.opacity = '0';
+            alert.style.transition = 'opacity 0.5s';
+            setTimeout(function () { alert.remove(); }, 500);
+        }, 4000);
+    }
+
+    // ── Smooth anchor ──
+    $('a[href^="#"]').on('click', function (e) {
+        var target = $(this.getAttribute('href'));
+        if (target.length) {
+            e.preventDefault();
+            $('html, body').stop().animate({ scrollTop: target.offset().top - 80 }, 900);
+        }
+    });
+
+    // ── Staggered reveal on scroll ──
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry, i) {
+            if (entry.isIntersecting) {
+                entry.target.style.transitionDelay = (i * 0.08) + 's';
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.product-card, .cat-card, .look-item, .gallery-item').forEach(function (el) {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+
+    // Add visible class via CSS injection
+    var style = document.createElement('style');
+    style.textContent = '.visible { opacity: 1 !important; transform: translateY(0) !important; }';
+    document.head.appendChild(style);
+</script>
 </body>
 </html>

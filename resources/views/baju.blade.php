@@ -83,7 +83,7 @@
                 <div class="col-lg-3 col-md-4 col-6">
                     <div class="single-product-item">
                         <div class="product-img-box">
-                            <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_produk }}">
+                            <img src="{{ Storage::url($product->gambar) }}" alt="{{ $product->nama_produk }}">
                         </div>
                         <div class="product-info">
                             <h4>{{ $product->nama_produk }}</h4>

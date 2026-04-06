@@ -106,7 +106,7 @@
                                 <tr class="outfit-row" data-name="{{ strtolower($outfit->judul) }}">
                                     <td class="ps-4 text-muted fw-semibold" style="font-size:13px;">{{ $loop->iteration }}</td>
                                     <td>
-                                        <img src="{{ asset('storage/' . $outfit->gambar) }}"
+                                        <img src="{{ Storage::url($outfit->gambar) }}"
                                              alt="{{ $outfit->judul }}"
                                              class="rounded-3 shadow-sm"
                                              style="width:72px; height:72px; object-fit:cover;">

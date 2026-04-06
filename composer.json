@@ -83,6 +83,7 @@
             "php-http/discovery": true
         }
     },
+    "laravelExtraIntellisense.phpPath": "/usr/bin/php",
     "minimum-stability": "stable",
     "prefer-stable": true
 }

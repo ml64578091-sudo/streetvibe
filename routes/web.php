@@ -2,9 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
-// Import Controllers
+// Controllers
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -13,48 +12,42 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\OutfitController as AdminOutfitController;
 use App\Http\Controllers\Admin\GalleryController;
 
-// Import Models
+// Models
 use App\Models\Product;
 use App\Models\Outfit;
 use App\Models\GalleryPhoto;
 
 /*
 |--------------------------------------------------------------------------
-| 1. HALAMAN UTAMA (WELCOME)
+| 1. HALAMAN UTAMA
 |--------------------------------------------------------------------------
 */
-
 Route::get('/', function () {
-    // Mengambil data produk, gallery, dan outfit untuk landing page
     $products = Product::latest()->take(8)->get();
     $galleryPhotos = GalleryPhoto::orderBy('urutan', 'asc')->latest()->get();
 
-    // Pastikan variabel galleryPhotos selalu ada agar tidak error di welcome
-    return view('welcome', [
-        'products' => $products,
-        'galleryPhotos' => $galleryPhotos
-    ]);
+    return view('welcome', compact('products', 'galleryPhotos'));
 })->name('welcome');
 
 /*
 |--------------------------------------------------------------------------
-| 2. USER AREA (SHOP & KERANJANG)
+| 2. USER AREA
 |--------------------------------------------------------------------------
 */
 
-// PERBAIKAN: Mengubah '/shop' menjadi '/products' agar sesuai dengan link di Welcome
-Route::get('/products', [ProductController::class, 'index'])->name('user.products');
+// Produk (USER)
+Route::get('/products', [ProductController::class, 'showKategori'])->name('user.products');
 
 // Detail Produk
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 
-// Gallery Inspirasi Outfit
+// Outfit Gallery
 Route::get('/outfits-gallery', function () {
     $outfits = Outfit::with('products')->latest()->get();
     return view('Outfit', compact('outfits'));
 })->name('user.outfits.index');
 
-// --- FITUR KERANJANG ---
+// Cart
 Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/add/{id}', 'add')->name('add');
@@ -63,21 +56,33 @@ Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(f
 
 /*
 |--------------------------------------------------------------------------
-| 3. AUTH & ADMIN AREA
+| 3. AUTH
 |--------------------------------------------------------------------------
 */
-
 Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+/*
+|--------------------------------------------------------------------------
+| 4. ADMIN AREA
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
+    // Produk
     Route::resource('products', ProductController::class);
+
+    // Kategori
     Route::resource('categories', CategoryController::class);
+
+    // Brand
     Route::resource('brands', BrandController::class);
+
+    // Outfit
     Route::resource('outfit', AdminOutfitController::class);
 
+    // Gallery
     Route::controller(GalleryController::class)->prefix('gallery')->name('gallery.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');

@@ -84,7 +84,7 @@
                         <div class="cart-item-card shadow-sm">
                             <div class="row align-items-center">
                                 <div class="col-4 col-md-2">
-                                    <img src="{{ asset('storage/' . $item['gambar']) }}" class="prod-thumb shadow-sm">
+                                    <img src="{{ Storage::url($item['gambar']) }}" class="prod-thumb shadow-sm">
                                 </div>
 
                                 <div class="col-8 col-md-4">

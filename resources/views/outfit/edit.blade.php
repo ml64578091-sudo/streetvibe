@@ -19,7 +19,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold d-block">Foto Saat Ini</label>
-                    <img src="{{ asset('storage/' . $outfit->gambar) }}" alt="" width="150" class="rounded shadow-sm mb-2">
+                    <img src="{{ Storage::url($outfit->gambar) }}" alt="" width="150" class="rounded shadow-sm mb-2">
                     <input type="file" name="gambar" class="form-control">
                     <div class="form-text text-danger">*Kosongkan jika tidak ingin mengganti foto.</div>
                 </div>

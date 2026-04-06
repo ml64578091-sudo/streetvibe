@@ -70,7 +70,7 @@
                         <input type="file" name="gambar" class="form-control">
                         @if($product->gambar)
                             <div class="mt-2 p-2 border rounded d-inline-block bg-light">
-                                <img src="{{ asset('storage/' . $product->gambar) }}" width="80" alt="Current Image">
+                                <img src="{{ Storage::url($product->gambar) }}" width="80" alt="Current Image">
                                 <small class="d-block text-muted text-center">Gambar Saat Ini</small>
                             </div>
                         @endif

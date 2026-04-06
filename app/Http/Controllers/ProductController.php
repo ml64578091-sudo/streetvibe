@@ -78,7 +78,7 @@ class ProductController extends Controller
     }
 
     $products = $query->get();
-    return view('products', compact('products')); // Sesuaikan dengan nama file view kamu
+    return view('product.index', compact('products')); // Sesuaikan dengan nama file view kamu
 }
     public function create()
     {
@@ -97,7 +97,7 @@ class ProductController extends Controller
             'gambar'      => 'required|image|mimes:jpeg,png,webp,jpg|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $request->only('nama_produk', 'harga', 'category_id', 'brand_id', 'deskripsi');
 
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('products', 'public');
@@ -125,7 +125,7 @@ class ProductController extends Controller
             'gambar'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $request->only('nama_produk', 'harga', 'category_id', 'brand_id', 'deskripsi');
 
         if ($request->hasFile('gambar')) {
             if ($product->gambar) {

@@ -55,7 +55,7 @@
                                     </td>
                                     <td class="border-bottom-0">
                                         @if($p->gambar)
-                                            <img src="{{ asset('storage/' . $p->gambar) }}" width="50" class="rounded">
+                                            <img src="{{ Storage::url($p->gambar) }}" width="50" class="rounded">
                                         @else
                                             <span class="badge bg-secondary">No Image</span>
                                         @endif

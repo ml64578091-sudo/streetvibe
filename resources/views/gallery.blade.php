@@ -124,7 +124,7 @@
                                 {{-- Image Container --}}
                                 <div class="position-relative" style="height: 220px;">
                                     <span class="badge-order shadow-sm"><i class="ti ti-hash"></i> {{ $photo->urutan }}</span>
-                                    <img src="{{ asset('storage/' . $photo->foto) }}" class="w-100 h-100" style="object-fit:cover;">
+                                    <img src="{{ Storage::url($photo->foto) }}" class="w-100 h-100" style="object-fit:cover;">
 
                                     {{-- Overlay Actions (Muncul di bawah gambar) --}}
                                     <div class="position-absolute bottom-0 start-0 w-100 p-2 d-flex justify-content-center gap-2 bg-dark bg-opacity-25 backdrop-blur">
