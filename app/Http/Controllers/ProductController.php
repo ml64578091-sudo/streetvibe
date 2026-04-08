@@ -42,7 +42,6 @@ class ProductController extends Controller
 
         $products = Product::where('kategori', $kategori)->latest()->get();
 
-
         return view('produk', [
             'products'     => $products,
             'pageTitle'    => $config[$kategori]['title'],
@@ -50,19 +49,21 @@ class ProductController extends Controller
         ]);
     }
 
-    // Detail Produk
+    // =============================
+    // DETAIL PRODUK
+    // =============================
     public function show($id)
-    {
-        $product = Product::with(['category', 'brand'])->findOrFail($id);
+{
+    $product = Product::with(['category', 'brand'])->findOrFail($id);
 
-        $relatedProducts = Product::where('category_id', $product->category_id)
-            ->where('id', '!=', $id)
-            ->latest()
-            ->take(4)
-            ->get();
+    $relatedProducts = Product::where('category_id', $product->category_id)
+        ->where('id', '!=', $id)
+        ->latest()
+        ->take(8)
+        ->get();
 
-        return view('product.show', compact('product'));
-    }
+    return view('product.show', compact('product', 'relatedProducts'));
+}
 
     // =============================
     // BACKEND (ADMIN)
