@@ -471,7 +471,6 @@
 
             <!-- TRUST -->
             <div class="trust-strip">
-                <div class="trust-item"><i class="fa fa-truck"></i>Free Shipping<br>above 500k</div>
                 <div class="trust-item"><i class="fa fa-shield"></i>Authentic<br>Guarantee</div>
                 <div class="trust-item"><i class="fa fa-undo"></i>Easy<br>Returns</div>
                 <div class="trust-item"><i class="fa fa-lock"></i>Secure<br>Payment</div>

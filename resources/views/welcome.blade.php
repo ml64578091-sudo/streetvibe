@@ -813,8 +813,10 @@
             <div class="product-img-wrap">
                 <div class="product-tag">New</div>
                <a href="{{ route('products.show', $product->id) }}">
-                   <img src="{{ asset('storage/' . $product->gambar) }}" alt="denim">
-                    
+                  <img src="{{ Storage::url($product->gambar) }}"
+                                                 alt="{{ $product->nama_produk }}"
+                                                 class="rounded-3 shadow-sm">
+
                 </a>
                 <div class="product-actions">
                     <form action="{{ route('cart.add', $product->id) }}" method="POST" style="flex:1; display:flex;">
