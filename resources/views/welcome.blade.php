@@ -802,45 +802,274 @@
 </section>
 
 <!-- ═══════════════════════════════════════ PRODUCTS ═══════════════════════════════════════ -->
-<section class="products-section">
-    <div class="section-header">
-        <span class="section-eyebrow">Fresh Arrivals</span>
-        <h2 class="section-title">LATEST DROPS</h2>
-    </div>
-    <div class="products-grid">
-        @forelse($products as $product)
-        <div class="product-card">
-            <div class="product-img-wrap">
-                <div class="product-tag">New</div>
-               <a href="{{ route('products.show', $product->id) }}">
-                  <img src="{{ Storage::url($product->gambar) }}"
-                                                 alt="{{ $product->nama_produk }}"
-                                                 class="rounded-3 shadow-sm">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
-                </a>
-                <div class="product-actions">
-                    <form action="{{ route('cart.add', $product->id) }}" method="POST" style="flex:1; display:flex;">
-                        @csrf
-                        <button type="submit" class="btn-cart">
-                            <span class="lnr lnr-cart"></span> Add to Cart
-                        </button>
-                    </form>
-                    <a href="{{ route('products.show', $product->id) }}" class="btn-wishlist">
-                        <span class="lnr lnr-eye"></span>
+<style>
+    :root {
+        --primary-black: #111111;
+        --accent-red: #ff3e3e;
+        --soft-grey: #f8f8f8;
+        --border-color: #eeeeee;
+        --text-muted: #888888;
+        --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .products-section {
+        padding: 100px 0;
+        background: #ffffff;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Section Header */
+    .section-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .section-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        font-size: 11px;
+        color: var(--accent-red);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    .section-title {
+        font-size: 42px;
+        font-weight: 900;
+        letter-spacing: -1.5px;
+        color: var(--primary-black);
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    .header-line {
+        width: 50px;
+        height: 4px;
+        background: var(--primary-black);
+        margin: 20px auto 0;
+    }
+
+    /* Grid System */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+    }
+
+    /* Product Card */
+    .product-card {
+        background: #fff;
+        position: relative;
+        transition: var(--transition);
+    }
+
+    .product-img-container {
+        position: relative;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+        background: var(--soft-grey);
+        border-radius: 4px;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: var(--primary-black);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 6px 14px;
+        z-index: 10;
+        letter-spacing: 1px;
+        border-radius: 2px;
+    }
+
+    /* Hover State */
+    .product-card:hover .product-image {
+        transform: scale(1.08);
+    }
+
+    .img-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+        opacity: 0;
+        transition: var(--transition);
+        z-index: 5;
+    }
+
+    .product-card:hover .img-overlay {
+        opacity: 1;
+    }
+
+    /* Floating Actions */
+    .product-actions {
+        position: absolute;
+        bottom: -70px; /* Sembunyi di bawah */
+        left: 0;
+        width: 100%;
+        display: flex;
+        padding: 20px;
+        gap: 10px;
+        z-index: 15;
+        transition: var(--transition);
+    }
+
+    .product-card:hover .product-actions {
+        bottom: 0;
+    }
+
+    .btn-action {
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+        border-radius: 4px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .btn-main-cart {
+        flex: 1;
+        background: #ffffff;
+        color: var(--primary-black);
+        font-size: 12px;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-main-cart:hover {
+        background: var(--primary-black);
+        color: #ffffff;
+    }
+
+    .btn-view {
+        width: 48px;
+        background: rgba(255,255,255,0.95);
+        color: var(--primary-black);
+        font-size: 18px;
+    }
+
+    .btn-view:hover {
+        background: var(--accent-red);
+        color: #fff;
+    }
+
+    /* Product Details */
+    .product-details {
+        padding: 20px 0;
+    }
+
+    .brand-name {
+        font-size: 10px;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+
+    .product-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--primary-black);
+        margin: 0 0 8px 0;
+        transition: var(--transition);
+        text-decoration: none;
+        display: block;
+    }
+
+    .product-title:hover {
+        color: var(--accent-red);
+    }
+
+    .price-tag {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .empty-state {
+        grid-column: 1/-1;
+        text-align: center;
+        padding: 100px 0;
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+    }
+
+    .empty-state p {
+        color: var(--text-muted);
+        font-size: 16px;
+    }
+</style>
+
+<section class="products-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-eyebrow">Fresh Arrivals</span>
+            <h2 class="section-title">LATEST DROPS</h2>
+            <div class="header-line"></div>
+        </div>
+
+        <div class="products-grid">
+            @forelse($products as $product)
+            <div class="product-card">
+                <div class="product-img-container">
+                    <div class="product-badge">NEW</div>
+
+                    <a href="{{ route('products.show', $product->id) }}">
+                        <img src="{{ Storage::url($product->gambar) }}"
+                             alt="{{ $product->nama_produk }}"
+                             class="product-image">
+                        <div class="img-overlay"></div>
                     </a>
+
+                    <div class="product-actions">
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" style="flex:1;">
+                            @csrf
+                            <button type="submit" class="btn-action btn-main-cart w-100">
+                                <span class="lnr lnr-cart"></span> ADD TO CART
+                            </button>
+                        </form>
+                        <a href="{{ route('products.show', $product->id) }}" class="btn-action btn-view">
+                            <span class="lnr lnr-eye"></span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="product-details">
+                    <div class="brand-name">STREETVIBE</div>
+                    <a href="{{ route('products.show', $product->id) }}" class="product-title">
+                        {{ strtoupper($product->nama_produk) }}
+                    </a>
+                    <div class="price-tag">Rp {{ number_format($product->harga, 0, ',', '.') }}</div>
                 </div>
             </div>
-            <div class="product-info">
-                <div class="product-brand">StreetVibe</div>
-                <div class="product-name">{{ strtoupper($product->nama_produk) }}</div>
-                <div class="product-price">Rp {{ number_format($product->harga, 0, ',', '.') }}</div>
+            @empty
+            <div class="empty-state">
+                <p>Belum ada produk yang tersedia saat ini.</p>
             </div>
+            @endforelse
         </div>
-        @empty
-        <div style="grid-column: 1/-1; text-align:center; padding: 60px 0; color: var(--grey);">
-            <p style="font-size:16px;">Belum ada produk yang tersedia.</p>
-        </div>
-        @endforelse
     </div>
 </section>
 

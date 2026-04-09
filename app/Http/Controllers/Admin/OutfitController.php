@@ -9,97 +9,75 @@ use Illuminate\Support\Facades\Storage;
 
 class OutfitController extends Controller
 {
-    /**
-     * Menampilkan daftar outfit (Halaman Index)
-     * View: resources/views/outfit/index.blade.php
-     */
     public function index()
     {
         $outfits = Outfit::latest()->get();
         return view('outfit.index', compact('outfits'));
     }
 
-    /**
-     * Menampilkan form tambah outfit
-     * View: resources/views/outfit/create.blade.php
-     */
     public function create()
     {
         return view('outfit.create');
     }
 
-    /**
-     * Menyimpan data outfit baru ke database
-     */
     public function store(Request $request)
     {
+        // Validasi disesuaikan dengan nama input di form (instagram_username)
         $request->validate([
             'judul' => 'required|string|max:255',
             'gambar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'deskripsi' => 'nullable',
+            'instagram_username' => 'required|string|max:100',
         ]);
 
         // Proses Upload Gambar
         $path = $request->file('gambar')->store('outfits', 'public');
 
-        // Simpan ke Database
+        // Simpan ke Database (instagram_username disimpan ke kolom deskripsi)
         Outfit::create([
             'judul' => $request->judul,
             'gambar' => $path,
-            'deskripsi' => $request->deskripsi,
+            'deskripsi' => $request->instagram_username,
         ]);
 
-        // Redirect menggunakan Route Name dari web.php (admin.outfit.index)
         return redirect()->route('admin.outfit.index')->with('success', 'Outfit berhasil ditambahkan!');
     }
 
-    /**
-     * Menampilkan form edit outfit
-     * View: resources/views/outfit/edit.blade.php
-     */
     public function edit($id)
     {
         $outfit = Outfit::findOrFail($id);
         return view('outfit.edit', compact('outfit'));
     }
 
-    /**
-     * Memperbarui data outfit di database
-     */
     public function update(Request $request, $id)
     {
         $outfit = Outfit::findOrFail($id);
 
         $request->validate([
             'judul' => 'required|string|max:255',
+            'instagram_username' => 'required|string|max:100',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
             if ($outfit->gambar) {
                 Storage::disk('public')->delete($outfit->gambar);
             }
-            // Upload gambar baru
             $path = $request->file('gambar')->store('outfits', 'public');
             $outfit->gambar = $path;
         }
 
         $outfit->judul = $request->judul;
-        $outfit->deskripsi = $request->deskripsi;
+        // Update username instagram ke kolom deskripsi
+        $outfit->deskripsi = $request->instagram_username;
         $outfit->save();
 
         return redirect()->route('admin.outfit.index')->with('success', 'Outfit berhasil diupdate!');
     }
 
-    /**
-     * Menghapus data outfit
-     */
     public function destroy($id)
     {
         $outfit = Outfit::findOrFail($id);
 
-        // Hapus file gambar dari storage
         if ($outfit->gambar) {
             Storage::disk('public')->delete($outfit->gambar);
         }

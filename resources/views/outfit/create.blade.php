@@ -8,7 +8,7 @@
         <div class="col-12 d-flex justify-content-between align-items-center">
             <div>
                 <h5 class="fw-bold mb-0">Tambah Referensi Outfit</h5>
-                <small class="text-muted">Buat inspirasi gaya baru untuk galeri outfit</small>
+                <small class="text-muted">Hubungkan inspirasi gaya langsung ke akun Instagram</small>
             </div>
             <a href="{{ route('admin.outfit.index') }}" class="btn btn-light d-flex align-items-center gap-2 border">
                 <i class="ti ti-arrow-left"></i> Kembali
@@ -43,9 +43,9 @@
                         <div class="d-flex align-items-center gap-2 mb-4 pb-2 border-bottom">
                             <div class="d-flex align-items-center justify-content-center rounded-2 bg-primary bg-opacity-10"
                                  style="width:32px;height:32px;">
-                                <i class="ti ti-pencil text-primary" style="font-size:16px;"></i>
+                                <i class="ti ti-brand-instagram text-primary" style="font-size:16px;"></i>
                             </div>
-                            <span class="fw-bold" style="font-size:14px;">Detail Outfit</span>
+                            <span class="fw-bold" style="font-size:14px;">Informasi Outfit & Instagram</span>
                         </div>
 
                         <div class="mb-4">
@@ -57,11 +57,17 @@
                         </div>
 
                         <div class="mb-0">
-                            <label class="form-label fw-semibold" style="font-size:13px;">Deskripsi / Tips Padu Padan</label>
-                            <textarea name="deskripsi" rows="8"
-                                      class="form-control @error('deskripsi') is-invalid @enderror"
-                                      placeholder="Tuliskan detail pakaian yang digunakan, perpaduan warna, atau tips lainnya...">{{ old('deskripsi') }}</textarea>
-                            @error('deskripsi')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            <label class="form-label fw-semibold" style="font-size:13px;">Username Instagram <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-muted" style="font-size:14px;">@</span>
+                                <input type="text" name="instagram_username" value="{{ old('instagram_username') }}"
+                                       class="form-control @error('instagram_username') is-invalid @enderror"
+                                       placeholder="username_pengguna" required>
+                            </div>
+                            <div class="form-text mt-2" style="font-size: 11px;">
+                                <i class="ti ti-info-circle"></i> Saat foto diklik di halaman utama, pengunjung akan diarahkan ke profil ini.
+                            </div>
+                            @error('instagram_username')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                         </div>
                     </div>
                 </div>
@@ -84,7 +90,7 @@
                         <div id="previewWrap" class="d-none mb-3">
                             <img id="imagePreview" src="#" alt="Preview"
                                  class="rounded-3 w-100" style="max-height:400px; object-fit:cover;">
-                            <button type="button" class="btn btn-sm btn-danger w-100 mt-2" onclick="resetUpload()">
+                            <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="resetUpload()">
                                 <i class="ti ti-trash"></i> Ganti Foto
                             </button>
                         </div>
@@ -101,8 +107,9 @@
                         <input type="file" name="gambar" id="fileInput"
                                class="d-none @error('gambar') is-invalid @enderror"
                                accept="image/*" onchange="previewImage(event)" required>
-                        <div class="form-text mt-2" style="font-size: 11px;">
-                            <i class="ti ti-info-circle"></i> Gunakan rasio 3:4 atau 9:16 untuk hasil estetik.
+
+                        <div class="form-text mt-3" style="font-size: 11px;">
+                            <i class="ti ti-maximize"></i> Gunakan rasio <strong>3:4</strong> atau <strong>9:16</strong> untuk tampilan feed yang rapi.
                         </div>
                         @error('gambar')<div class="text-danger mt-1" style="font-size:12px;">{{ $message }}</div>@enderror
                     </div>
@@ -111,10 +118,10 @@
                 {{-- Action Button --}}
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-2">
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-2 shadow-sm">
                             <i class="ti ti-device-floppy me-1"></i> Simpan Outfit
                         </button>
-                        <a href="{{ route('admin.outfit.index') }}" class="btn btn-light border w-100 fw-semibold">
+                        <a href="{{ route('admin.outfit.index') }}" class="btn btn-light border w-100 fw-semibold text-muted">
                             Batal
                         </a>
                     </div>

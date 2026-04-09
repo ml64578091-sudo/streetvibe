@@ -468,7 +468,7 @@
         <li><a href="{{ url('/products?kategori=sepatu') }}">Footwear</a></li>
         <li><a href="{{ route('user.outfits.index') }}" class="active">Outfit</a></li>
         @auth
-        <li><a href="{{ route('home') }}">Dashboard</a></li>
+
         @else
         <li><a href="{{ route('login') }}">Login</a></li>
         @endauth
@@ -549,25 +549,35 @@
     <div class="outfits-grid" id="outfitsGrid">
         @forelse($outfits as $i => $outfit)
         <div class="outfit-card reveal">
-            <div class="outfit-img-wrap">
-                <div class="outfit-badge">Streetwear</div>
-                <div class="card-num">{{ str_pad($i+1, 2, '0', STR_PAD_LEFT) }}</div>
-                <img src="{{ Storage::url($outfit->gambar) }}" alt="{{ $outfit->judul }}">
-                <div class="outfit-overlay">
-                    <div class="overlay-label">✦ Outfit Reference</div>
-                    <div class="overlay-title">{{ strtoupper($outfit->judul) }}</div>
-                    <div class="overlay-desc">{{ $outfit->deskripsi }}</div>
-                </div>
-            </div>
-            <div class="outfit-body">
-                <div class="outfit-name">{{ strtoupper($outfit->judul) }}</div>
-                <div class="outfit-desc-preview">{{ $outfit->deskripsi }}</div>
-                <div class="outfit-footer">
-                    <span class="outfit-tag">✦ Style Guide</span>
-                    <div class="outfit-arrow"><i class="fa fa-arrow-right"></i></div>
-                </div>
+    {{-- Link Instagram membungkus area gambar dan overlay --}}
+    <a href="https://www.instagram.com/{{ $outfit->deskripsi }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
+        <div class="outfit-img-wrap">
+            <div class="outfit-badge">Streetwear</div>
+            <div class="card-num">{{ str_pad($i+1, 2, '0', STR_PAD_LEFT) }}</div>
+
+            <img src="{{ Storage::url($outfit->gambar) }}" alt="{{ $outfit->judul }}">
+
+            <div class="outfit-overlay">
+                <div class="overlay-label">✦ Outfit Reference</div>
+                <div class="overlay-title">{{ strtoupper($outfit->judul) }}</div>
+                {{-- Menampilkan Username dengan simbol @ di overlay --}}
+                <div class="overlay-desc">@ {{ $outfit->deskripsi }}</div>
             </div>
         </div>
+    </a>
+
+    <div class="outfit-body">
+        <div class="outfit-name">{{ strtoupper($outfit->judul) }}</div>
+        {{-- Link tambahan pada bagian deskripsi bawah --}}
+            <div class="outfit-desc-preview" style="color: #666;">
+            </div>
+        </a>
+        <div class="outfit-footer">
+            <span class="outfit-tag">✦ Style Guide</span>
+            <div class="outfit-arrow"><i class="fa fa-arrow-right"></i></div>
+        </div>
+    </div>
+</div>
         @empty
         <div class="empty-state">
             <span class="empty-icon">EMPTY</span>

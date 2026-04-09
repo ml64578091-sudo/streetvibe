@@ -53,17 +53,17 @@ class ProductController extends Controller
     // DETAIL PRODUK
     // =============================
     public function show($id)
-{
-    $product = Product::with(['category', 'brand'])->findOrFail($id);
+    {
+        $product = Product::with(['category', 'brand'])->findOrFail($id);
 
-    $relatedProducts = Product::where('category_id', $product->category_id)
-        ->where('id', '!=', $id)
-        ->latest()
-        ->take(8)
-        ->get();
+        $relatedProducts = Product::where('category_id', $product->category_id)
+            ->where('id', '!=', $id)
+            ->latest()
+            ->take(8)
+            ->get();
 
-    return view('product.show', compact('product', 'relatedProducts'));
-}
+        return view('product.show', compact('product', 'relatedProducts'));
+    }
 
     // =============================
     // BACKEND (ADMIN)
@@ -94,6 +94,7 @@ class ProductController extends Controller
         $request->validate([
             'nama_produk' => 'required|string|max:255',
             'harga'       => 'required|numeric',
+            'status'      => 'required|in:ready,sold out,sale', // Tambahan Validasi
             'category_id' => 'required|exists:categories,id',
             'brand_id'    => 'required|exists:brands,id',
             'kategori'    => 'required|in:baju,celana,sepatu,jacket',
@@ -104,6 +105,7 @@ class ProductController extends Controller
         $data = $request->only(
             'nama_produk',
             'harga',
+            'status', // Sekarang status ikut diambil
             'category_id',
             'brand_id',
             'deskripsi',
@@ -133,6 +135,7 @@ class ProductController extends Controller
         $request->validate([
             'nama_produk' => 'required|string|max:255',
             'harga'       => 'required|numeric',
+            'status'      => 'required|in:ready,sold out,sale', // Tambahan Validasi
             'category_id' => 'required|exists:categories,id',
             'brand_id'    => 'required|exists:brands,id',
             'kategori'    => 'required|in:baju,celana,sepatu,jacket',
@@ -143,6 +146,7 @@ class ProductController extends Controller
         $data = $request->only(
             'nama_produk',
             'harga',
+            'status', // Sekarang status ikut diambil saat update
             'category_id',
             'brand_id',
             'deskripsi',
