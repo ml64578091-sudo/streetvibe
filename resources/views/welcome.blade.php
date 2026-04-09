@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('user/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('user/css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('user/css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* ─────────────────────────────── RESET & BASE ─────────────────────────────── */
@@ -1113,13 +1114,14 @@
     </div>
     <div class="gallery-grid">
         @foreach($galleryPhotos as $photo)
-        <div class="gallery-item">
-            <img src="{{ Storage::url($photo->foto) }}" alt="{{ $photo->caption }}">
-            <div class="gallery-hover">
-                <i class="fa fa-instagram"></i>
-                <p>{{ $photo->caption }}</p>
-            </div>
-        </div>
+       <div class="gallery-item" onclick="window.open('https://instagram.com/{{ str_replace('@', '', $photo->caption) }}', '_blank')" style="cursor: pointer;">
+    <img src="{{ Storage::url($photo->foto) }}" alt="{{ $photo->caption }}">
+
+    <div class="gallery-hover">
+        <i class="fab fa-instagram" style="font-size: 24px; color: white;"></i>
+        <p>{{ str_starts_with($photo->caption, '@') ? $photo->caption : '@' . $photo->caption }}</p>
+    </div>
+</div>
         @endforeach
     </div>
 </section>
