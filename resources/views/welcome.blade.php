@@ -177,12 +177,12 @@
             position: relative; overflow: hidden;
             display: flex; align-items: flex-end;
         }
-        .hero-right::before {
+        /* .hero-right::before {
             content: 'VIBE';
             font-family: 'Bebas Neue', sans-serif;
             font-size: 300px; color: rgba(255,255,255,0.03);
             position: absolute; bottom: -40px; right: -20px;
-            line-height: 1; pointer-events: none; user-select: none;
+            line-height: 1; pointer-events: none; user-select: none; */
         }
         .hero-img {
             width: 100%; height: 100%;
@@ -673,31 +673,29 @@
 
 <!-- ═══════════════════════════════════════ HERO ═══════════════════════════════════════ -->
 <section class="hero">
-    <div class="hero-left">
-        <div class="hero-eyebrow">Collection 2026</div>
+    <div class="hero-content">
+
+
         <h1 class="hero-title">
-            STREET<br>
-            <em>"Artistry"</em>
+            STREET <br>
+            <em>"Artistry"</em> <br>
             CULTURE
         </h1>
-        <p class="hero-desc">Lebih dari sekadar pakaian — ini adalah pernyataan tentang siapa dirimu di tengah keramaian kota.</p>
-        <div>
-            <a class="hero-cta" href="#products-section">
-                <span>Explore Collection</span>
-                <span class="lnr lnr-arrow-right"></span>
-            </a>
-        </div>
-        <div class="hero-tag">Free shipping on orders above Rp 500k</div>
+
+        <p class="hero-desc">
+            Lebih dari sekadar pakaian — ini adalah pernyataan tentang siapa dirimu di tengah keramaian kota.
+        </p>
+
+        <a class="hero-cta" href="#products-section">
+            <span>Explore Collection</span>
+            <span class="lnr lnr-arrow-right"></span>
+        </a>
+
+
+
         <div class="scroll-hint">
             <div class="scroll-line"></div>
             Scroll to discover
-        </div>
-    </div>
-    <div class="hero-right">
-        <img class="hero-img" src="{{ asset('img/convers.png') }}" alt="Hero Image">
-        <div class="hero-badge">
-            <div class="hero-badge-inner">NEW</div>
-            <div class="hero-badge-sub">Drop</div>
         </div>
     </div>
 </section>
@@ -802,10 +800,103 @@
     </div>
 </section>
 
+
+
+
+
+
+
+
 <!-- ═══════════════════════════════════════ PRODUCTS ═══════════════════════════════════════ -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
 <style>
+.hero {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px;
+    background: radial-gradient(circle at top, #565555, #040404);
+    color: #fff;
+}
+
+.hero-content {
+    max-width: 900px;
+    width: 100%;
+}
+
+.hero-eyebrow {
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: #ff6a00;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.hero-title {
+    font-size: 64px;
+    line-height: 1.1;
+    font-weight: 900;
+    margin-bottom: 20px;
+}
+
+.hero-title em {
+    font-style: normal;
+    color: #ff6a00;
+}
+
+.hero-desc {
+    font-size: 18px;
+    color: #bbb;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+.hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 30px;
+    background: #ff6a00;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 40px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(255, 106, 0, 0.3);
+}
+
+.hero-cta:hover {
+    background: #ff8533;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 106, 0, 0.5);
+}
+
+.hero-tag {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #888;
+}
+
+.scroll-hint {
+    margin-top: 40px;
+    font-size: 13px;
+    color: #666;
+}
+
+.scroll-line {
+    width: 2px;
+    height: 40px;
+    background: #ff6a00;
+    margin: 0 auto 10px;
+}
+
+
+
+
+
     :root {
         --primary-black: #111111;
         --accent-red: #ff3e3e;
