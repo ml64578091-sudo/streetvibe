@@ -1,189 +1,262 @@
 @extends('layouts.backend')
 
 @section('content')
-<div class="container-fluid">
 
-    {{-- Header --}}
-    <div class="row mb-4">
-        <div class="col-12 d-flex justify-content-between align-items-center">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+        --primary: #2563eb;
+        --accent: #8b5cf6;
+        --ink: #ffffff;
+        --card: #ffffff;
+        --card-2: #f8fafc;
+        --border: rgba(0,0,0,0.06);
+        --text: #0f172a;
+        --muted: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+    }
+
+    .admin-wrap {
+        background: var(--ink);
+        font-family: 'Syne', sans-serif;
+        color: var(--text);
+        min-height: 100vh;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* ── DECORATIVE BG ── */
+    .bg-orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+    .orb-1  { width: 700px; height: 700px; background: radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 70%); top: -200px; right: -150px; }
+    .orb-2  { width: 500px; height: 500px; background: radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%); bottom: 50px; left: -150px; }
+    .bg-grid {
+        position: fixed; inset: 0;
+        background-image: linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none; z-index: 0;
+    }
+    .admin-inner { position: relative; z-index: 1; }
+
+    /* ── TOPBAR (TULISAN TIDAK GEPENG) ── */
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 45px; flex-wrap: wrap; gap: 20px; }
+    .topbar-eyebrow {
+        font-size: 12px; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+    }
+    .topbar-eyebrow::before { content: ''; display: block; width: 20px; height: 2px; background: var(--primary); }
+
+    .topbar-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 48px;
+        letter-spacing: 0.05em; /* Memberi ruang antar huruf agar tidak gepeng */
+        color: var(--text);
+        line-height: 1.1;
+        margin: 0;
+    }
+    .topbar-title span { -webkit-text-stroke: 1.5px rgba(37,99,235,0.3); color: transparent; }
+
+    .btn-add-top {
+        display: inline-flex; align-items: center; gap: 10px;
+        padding: 14px 28px; background: linear-gradient(135deg, var(--primary), var(--accent));
+        border: none; border-radius: 14px; color: white !important;
+        font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.08em;
+        cursor: pointer; text-decoration: none; transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+    }
+    .btn-add-top:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3); }
+
+    /* ── STATS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 35px; }
+    .stat-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+        padding: 28px; position: relative; transition: all 0.3s;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+    .stat-icon {
+        width: 50px; height: 50px; border-radius: 12px; display: flex;
+        align-items: center; justify-content: center; font-size: 20px; margin-bottom: 18px;
+    }
+    .stat-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 52px; letter-spacing: 0.03em; color: var(--text); line-height: 1; }
+
+    /* ── TABLE CARD ── */
+    .table-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: 28px;
+        overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+    }
+    .table-toolbar { padding: 25px 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .search-box { position: relative; width: 100%; max-width: 350px; }
+    .search-box i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .search-box input {
+        width: 100%; padding: 12px 20px 12px 48px;
+        background: var(--card-2); border: 1px solid transparent; border-radius: 12px;
+        font-family: 'Syne', sans-serif; font-size: 14px; transition: all 0.3s;
+    }
+    .search-box input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(37,99,235,0.05); }
+
+    .sv-table { width: 100%; border-collapse: collapse; }
+    .sv-table thead th {
+        padding: 20px 30px; font-size: 11px; font-weight: 800; letter-spacing: 0.15em;
+        text-transform: uppercase; color: var(--muted); background: var(--card-2); text-align: left;
+    }
+    .sv-table tbody td { padding: 24px 30px; border-bottom: 1px solid rgba(0,0,0,0.03); vertical-align: middle; }
+
+    .brand-box { display: flex; align-items: center; gap: 18px; }
+    .brand-initial {
+        width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;
+        font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px;
+    }
+    .brand-name { font-weight: 800; font-size: 16px; color: var(--text); text-transform: uppercase; letter-spacing: 0.02em; }
+    .brand-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .status-pill {
+        display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px;
+        border-radius: 12px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;
+        text-transform: uppercase; background: rgba(16,185,129,0.08); color: #107e5e; border: 1px solid rgba(16,185,129,0.1);
+    }
+    .status-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
+
+    .action-btn {
+        width: 40px; height: 40px; border-radius: 12px; display: inline-flex;
+        align-items: center; justify-content: center; border: 1px solid var(--border);
+        background: white; color: var(--muted); transition: all 0.2s; cursor: pointer; text-decoration: none;
+    }
+    .action-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(37,99,235,0.05); transform: rotate(5deg); }
+    .action-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.05); transform: rotate(-5deg); }
+
+    @media (max-width: 992px) { .stats-grid { grid-template-columns: 1fr; } .admin-wrap { padding: 25px; } }
+</style>
+
+<div class="admin-wrap">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-grid"></div>
+
+    <div class="admin-inner">
+
+        {{-- ── TOPBAR ── --}}
+        <div class="topbar">
             <div>
-                <h5 class="fw-bold mb-0">Manajemen Brand</h5>
-                <small class="text-muted">Kelola semua brand produk Anda</small>
+                <div class="topbar-eyebrow">Inventory Division</div>
+                <h1 class="topbar-title">BRAND <span>AUTHORITY.</span></h1>
             </div>
-            <a href="{{ route('admin.brands.create') }}" class="btn btn-primary d-flex align-items-center gap-2 px-3">
-                <i class="ti ti-plus"></i> Tambah Brand Baru
+            <a href="{{ route('admin.brands.create') }}" class="btn-add-top">
+                <i class="fa fa-plus"></i> Tambah Brand Baru
             </a>
         </div>
-    </div>
 
-    {{-- Stats --}}
-    <div class="row mb-4 g-3">
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #0d6efd !important;">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary bg-opacity-10"
-                         style="width:48px; height:48px; flex-shrink:0">
-                        <i class="ti ti-brand-appstore fs-4 text-primary"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted" style="font-size:12px;">Total Brand</div>
-                        <div class="fw-bold fs-4">{{ $brands->count() }}</div>
-                    </div>
-                </div>
+        {{-- ── STATS ── --}}
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(37,99,235,0.08);color:var(--primary);"><i class="fa fa-building-shield"></i></div>
+                <div class="stat-label">Registered Brands</div>
+                <div class="stat-num">{{ str_pad($brands->count(), 2, '0', STR_PAD_LEFT) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(16,185,129,0.08);color:var(--success);"><i class="fa fa-circle-check"></i></div>
+                <div class="stat-label">Live Status</div>
+                <div class="stat-num">{{ str_pad($brands->count(), 2, '0', STR_PAD_LEFT) }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(139,92,246,0.08);color:var(--accent);"><i class="fa fa-calendar-check"></i></div>
+                <div class="stat-label">Added This Month</div>
+                <div class="stat-num">{{ str_pad($brands->filter(fn($b) => $b->created_at->isCurrentMonth())->count(), 2, '0', STR_PAD_LEFT) }}</div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #198754 !important;">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-success bg-opacity-10"
-                         style="width:48px; height:48px; flex-shrink:0">
-                        <i class="ti ti-circle-check fs-4 text-success"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted" style="font-size:12px;">Brand Aktif</div>
-                        <div class="fw-bold fs-4 text-success">{{ $brands->count() }}</div>
-                    </div>
+
+        {{-- ── MAIN TABLE ── --}}
+        <div class="table-card">
+
+            <div class="table-toolbar">
+                <div class="search-box">
+                    <i class="fa fa-search"></i>
+                    <input type="text" id="searchBrand" placeholder="Cari nama brand secara instan...">
                 </div>
+                @if(session('success'))
+                <div style="font-size: 13px; color: var(--success); font-weight: 700;">
+                    <i class="fa fa-check-circle"></i> DATA UPDATED
+                </div>
+                @endif
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #0dcaf0 !important;">
-                <div class="card-body d-flex align-items-center gap-3">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-info bg-opacity-10"
-                         style="width:48px; height:48px; flex-shrink:0">
-                        <i class="ti ti-calendar fs-4 text-info"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted" style="font-size:12px;">Bulan Ini</div>
-                        <div class="fw-bold fs-4 text-info">
-                            {{ $brands->filter(fn($b) => $b->created_at->isCurrentMonth())->count() }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    {{-- Tabel --}}
-    <div class="row">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-0">
+            <div style="overflow-x:auto;">
+                <table class="sv-table">
+                    <thead>
+                        <tr>
+                            <th style="width:100px; text-align:center;">No.</th>
+                            <th>Brand</th>
+                            
+                            <th style="text-align:center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($brands as $brand)
+                        <tr class="brand-row" data-name="{{ strtolower($brand->nama_brand) }}">
+                            <td style="text-align:center; font-family:'JetBrains Mono'; color:var(--muted);">
+                                #{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                            </td>
+                            <td>
+                                <div class="brand-box">
+                                    <div class="brand-initial">{{ substr($brand->nama_brand, 0, 1) }}</div>
+                                    <div>
+                                        <div class="brand-name">{{ $brand->nama_brand }}</div>
+                                        <div class="brand-id">UID: {{ str_pad($brand->id, 4, '0', STR_PAD_LEFT) }}</div>
+                                    </div>
+                                </div>
+                            </td>
 
-                    {{-- Notifikasi --}}
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 m-3 mb-0" role="alert">
-                            <i class="ti ti-circle-check fs-5"></i>
-                            {{ session('success') }}
-                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
-
-                    {{-- Search Bar --}}
-                    <div class="px-3 pt-3 pb-2 border-bottom">
-                        <div class="input-group" style="max-width: 320px;">
-                            <span class="input-group-text bg-light border-end-0">
-                                <i class="ti ti-search text-muted"></i>
-                            </span>
-                            <input type="text" id="searchBrand" class="form-control bg-light border-start-0 ps-0"
-                                   placeholder="Cari brand..." style="outline: none; box-shadow: none;">
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0" id="brandTable">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th class="ps-4 py-3 text-muted fw-semibold" style="font-size:12px; width:60px;">NO</th>
-                                    <th class="py-3 text-muted fw-semibold" style="font-size:12px;">NAMA BRAND</th>
-                                    <th class="py-3 text-muted fw-semibold text-center" style="font-size:12px; width:100px;">STATUS</th>
-                                    <th class="py-3 text-muted fw-semibold text-center pe-4" style="font-size:12px; width:180px;">AKSI</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($brands as $brand)
-                                <tr class="brand-row" data-name="{{ strtolower($brand->nama_brand) }}">
-                                    <td class="ps-4 text-muted fw-semibold" style="font-size:13px;">{{ $loop->iteration }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="d-flex align-items-center justify-content-center rounded-3 bg-primary bg-opacity-10"
-                                                 style="width:40px; height:40px; flex-shrink:0;">
-                                                <i class="ti ti-brand-appstore text-primary fs-5"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold text-uppercase" style="font-size:14px; letter-spacing:.3px;">{{ $brand->nama_brand }}</div>
-                                                <div class="text-muted" style="font-size:11px;">ID: #{{ $brand->id }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill d-inline-flex align-items-center gap-1"
-                                              style="background:#EAF3DE; color:#3B6D11; font-size:11px; padding: 5px 10px;">
-                                            <span style="width:6px;height:6px;border-radius:50%;background:#3B6D11;display:inline-block;"></span>
-                                            Aktif
-                                        </span>
-                                    </td>
-                                    <td class="text-center pe-4">
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <a href="{{ route('admin.brands.edit', $brand->id) }}"
-                                               class="btn btn-sm d-flex align-items-center gap-1"
-                                               style="background:#FAEEDA; color:#633806; border:1px solid #FAC775; font-size:12px;">
-                                                <i class="ti ti-edit"></i> Edit
-                                            </a>
-                                            <button type="button"
-                                                    class="btn btn-sm d-flex align-items-center gap-1"
-                                                    style="background:#FCEBEB; color:#791F1F; border:1px solid #F7C1C1; font-size:12px;"
-                                                    onclick="openModal({{ $brand->id }}, '{{ $brand->nama_brand }}')">
-                                                <i class="ti ti-trash"></i> Hapus
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="4" class="text-center py-5">
-                                        <i class="ti ti-inbox fs-1 text-muted d-block mb-2"></i>
-                                        <span class="text-muted">Belum ada brand yang terdaftar.</span>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{-- Footer --}}
-                    <div class="px-4 py-3 border-top d-flex align-items-center justify-content-between">
-                        <small class="text-muted">Menampilkan {{ $brands->count() }} brand</small>
-                        @if(method_exists($brands, 'links'))
-                            {{ $brands->links('pagination::bootstrap-5') }}
-                        @endif
-                    </div>
-
-                </div>
+                            <td style="text-align:center;">
+                                <div style="display:inline-flex; gap:10px;">
+                                    <a href="{{ route('admin.brands.edit', $brand->id) }}" class="action-btn" title="Edit Entity">
+                                        <i class="fa fa-pen-nib"></i>
+                                    </a>
+                                    <button onclick="openDeleteModal({{ $brand->id }}, '{{ addslashes($brand->nama_brand) }}')" class="action-btn danger" title="Remove">
+                                        <i class="fa fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding:80px; color:var(--muted);">
+                                <i class="fa fa-box-open" style="font-size:50px; opacity:0.1; margin-bottom:20px; display:block;"></i>
+                                <p style="font-weight: 600; letter-spacing: 0.05em;">NO BRAND ENTITIES FOUND</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-{{-- Modal Hapus --}}
+{{-- Modern Delete Modal --}}
 <div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-body p-4">
-                <div class="d-flex align-items-center justify-content-center rounded-3 mb-3"
-                     style="width:48px;height:48px;background:#FCEBEB;">
-                    <i class="ti ti-trash fs-4" style="color:#A32D2D;"></i>
+    <div class="modal-dialog modal-dialog-centered" style="max-width:400px;">
+        <div class="modal-content" style="border-radius:30px; border:none; box-shadow: 0 25px 60px rgba(0,0,0,0.2);">
+            <div class="modal-body" style="padding:45px; text-align:center;">
+                <div style="width:80px; height:80px; background:rgba(239,68,68,0.1); color:var(--danger); border-radius:24px; display:flex; align-items:center; justify-content:center; font-size:32px; margin:0 auto 25px; transform: rotate(-5deg);">
+                    <i class="fa fa-ban"></i>
                 </div>
-                <h6 class="fw-bold mb-1">Hapus Brand?</h6>
-                <p class="text-muted mb-4" style="font-size:13px;">
-                    Brand <strong id="deleteName"></strong> akan dihapus permanen dan berpengaruh pada produk terkait. Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-light flex-fill" data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" class="flex-fill">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn w-100" style="background:#A32D2D; color:#fff;">Ya, Hapus</button>
+                <h3 style="font-family:'Bebas Neue'; letter-spacing:0.05em; font-size:32px; color: var(--text);">DELETE BRAND?</h3>
+                <p style="color:var(--muted); font-size:15px; line-height:1.6; margin-bottom:35px;">Entitas <strong id="deleteName" style="color:var(--text)"></strong> akan dihapus secara permanen dari sistem.</p>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                    <button class="btn" data-bs-dismiss="modal" style="padding:14px; border-radius:15px; background:var(--card-2); font-weight:700; border:none; color: var(--muted);">CANCEL</button>
+                    <form id="deleteForm" method="POST">
+                        @csrf @method('DELETE')
+                        <button type="submit" style="width:100%; padding:14px; border-radius:15px; background:var(--danger); color:white; border:none; font-weight:700; box-shadow: 0 8px 15px rgba(239,68,68,0.2);">DELETE</button>
                     </form>
                 </div>
             </div>
@@ -192,19 +265,20 @@
 </div>
 
 <script>
-    // Search
-    document.getElementById('searchBrand').addEventListener('input', function () {
+    // Live Instant Search
+    document.getElementById('searchBrand').addEventListener('input', function() {
         const q = this.value.toLowerCase();
         document.querySelectorAll('.brand-row').forEach(row => {
             row.style.display = row.dataset.name.includes(q) ? '' : 'none';
         });
     });
 
-    // Modal hapus
-    function openModal(id, name) {
+    // Modal Delete Logic
+    function openDeleteModal(id, name) {
         document.getElementById('deleteName').textContent = name;
-        document.getElementById('deleteForm').action = '/admin/brands/' + id;
+        document.getElementById('deleteForm').action = `{{ url('admin/brands') }}/${id}`;
         new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
 </script>
+
 @endsection

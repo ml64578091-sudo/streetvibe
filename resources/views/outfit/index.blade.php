@@ -1,743 +1,255 @@
 @extends('layouts.backend')
 
 @section('content')
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     :root {
         --primary: #2563eb;
-        --primary-dark: #1e40af;
-        --primary-light: #3b82f6;
-        --success: #10b981;
-        --info: #06b6d4;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --dark: #1f2937;
-        --light: #f9fafb;
-        --border: #e5e7eb;
-        --text-muted: #6b7280;
+        --gold: #FFD200;
+        --orange: #F7971E;
+        --ink: #ffffff;
+        --surface: #f8f9fa;
+        --card: #ffffff;
+        --card-2: #f5f5f7;
+        --border: rgba(0,0,0,0.08);
+        --border-hover: rgba(0,0,0,0.14);
+        --text: #1a1a1a;
+        --muted: #6b6b7a;
+        --success: #3ddc84;
+        --danger: #ff5c5c;
     }
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    .admin-wrap {
+        background: var(--ink);
+        font-family: 'Syne', sans-serif;
+        color: var(--text);
+        min-height: 100vh;
+        padding: 36px 40px;
+        position: relative;
+        overflow: hidden;
     }
 
-    body {
-        background: linear-gradient(135deg, #f0f4f8 0%, #f9fafb 100%);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    /* ── DECORATIVE BG ── */
+    .bg-orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+    .orb-1  { width: 600px; height: 600px; background: radial-gradient(circle, rgba(37,99,235,0.06) 0%, transparent 70%); top: -150px; right: -100px; }
+    .orb-2  { width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,210,0,0.05) 0%, transparent 70%); bottom: 100px; left: -100px; }
+    .bg-grid {
+        position: fixed; inset: 0;
+        background-image: linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px);
+        background-size: 48px 48px;
+        pointer-events: none; z-index: 0;
     }
+    .admin-inner { position: relative; z-index: 1; }
 
-    .container-fluid {
-        padding: 2rem 2.5rem;
+    /* ── TOPBAR ── */
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; flex-wrap: wrap; gap: 16px; }
+    .topbar-eyebrow {
+        font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+        color: var(--primary); margin-bottom: 4px;
+        display: flex; align-items: center; gap: 8px;
     }
+    .topbar-eyebrow::before { content: ''; display: block; width: 16px; height: 2px; background: var(--primary); }
+    .topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 2px; color: #0b0b0f; line-height: 1; }
+    .topbar-title span { -webkit-text-stroke: 1.5px rgba(37,99,235,0.4); color: transparent; }
 
-    /* ═══════════════════════════════ HEADER ═══════════════════════════════ */
-    .header-section {
-        margin-bottom: 2rem;
+    .btn-add-top {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 24px; background: linear-gradient(135deg, var(--primary), #1e40af);
+        border: none; border-radius: 12px; color: white !important;
+        font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 1.5px;
+        cursor: pointer; text-decoration: none; transition: all 0.3s;
+        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25);
     }
+    .btn-add-top:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); }
 
-    .header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1.5rem;
-    }
-
-    .header-title h5 {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--dark);
-        letter-spacing: -0.5px;
-        margin: 0 0 0.25rem 0;
-    }
-
-    .header-title small {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        display: block;
-    }
-
-    .btn-add {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-        color: white !important;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        font-size: 0.95rem;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn-add:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
-        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-    }
-
-    .btn-add i {
-        font-size: 1.1rem;
-    }
-
-    /* ═══════════════════════════════ STATS CARDS ═══════════════════════════════ */
-    .stats-section {
-        margin-bottom: 2.5rem;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-    }
-
+    /* ── STATS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
     .stat-card {
-        background: white;
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        border: 1px solid var(--border);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
+        background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+        padding: 24px; position: relative; overflow: hidden;
+        transition: all 0.3s; animation: fadeUp 0.5s ease both;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--primary), var(--primary-light));
-    }
-
-    .stat-card:nth-child(2)::before {
-        background: linear-gradient(90deg, var(--success), #34d399);
-    }
-
-    .stat-card:nth-child(3)::before {
-        background: linear-gradient(90deg, var(--info), #22d3ee);
-    }
-
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-        border-color: var(--primary);
-    }
-
-    .stat-card-content {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--primary); }
     .stat-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 0.625rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        flex-shrink: 0;
-        background: var(--light);
-        transition: all 0.3s ease;
+        width: 48px; height: 48px; border-radius: 12px; display: flex;
+        align-items: center; justify-content: center; font-size: 20px; margin-bottom: 15px;
     }
+    .stat-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 1px; color: #0b0b0f; line-height: 1; }
 
-    .stat-card:hover .stat-icon {
-        background: var(--primary);
-        color: white;
-        transform: scale(1.1);
-    }
-
-    .stat-card:nth-child(2):hover .stat-icon {
-        background: var(--success);
-    }
-
-    .stat-card:nth-child(3):hover .stat-icon {
-        background: var(--info);
-    }
-
-    .stat-text-label {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-    }
-
-    .stat-text-value {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: var(--dark);
-    }
-
-    /* ═══════════════════════════════ TABLE CARD ═══════════════════════════════ */
+    /* ── MAIN CARD & TABLE ── */
     .table-card {
-        background: white;
-        border-radius: 0.75rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        border: 1px solid var(--border);
-        overflow: hidden;
+        background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+        overflow: hidden; animation: fadeUp 0.6s 0.2s ease both;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+    .table-toolbar { padding: 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
+    .search-box { position: relative; flex: 1; max-width: 400px; }
+    .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .search-box input {
+        width: 100%; padding: 12px 16px 12px 45px;
+        background: var(--card-2); border: 1px solid var(--border); border-radius: 12px;
+        font-family: 'Syne', sans-serif; transition: all 0.3s;
+    }
+    .search-box input:focus { outline: none; border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+
+    .sv-table { width: 100%; border-collapse: collapse; }
+    .sv-table thead th {
+        padding: 16px 24px; font-size: 10px; font-weight: 800; letter-spacing: 2px;
+        text-transform: uppercase; color: var(--muted); background: var(--card-2); text-align: left;
+    }
+    .sv-table tbody td { padding: 20px 24px; border-bottom: 1px solid rgba(0,0,0,0.04); vertical-align: middle; }
+
+    .prod-img { width: 70px; height: 70px; border-radius: 14px; object-fit: cover; border: 1px solid var(--border); }
+    .look-title { font-weight: 800; font-size: 15px; color: #0b0b0f; margin-bottom: 4px; }
+    .look-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+    .look-desc { font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 300px; }
+
+    /* ── ACTIONS ── */
+    .action-btn {
+        width: 38px; height: 38px; border-radius: 10px; display: inline-flex;
+        align-items: center; justify-content: center; border: 1px solid var(--border);
+        background: white; color: var(--muted); transition: all 0.2s; cursor: pointer; text-decoration: none;
+    }
+    .action-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(37,99,235,0.05); }
+    .action-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(255,92,92,0.05); }
+
+    /* ── ANIMATION ── */
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    .table-card-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .search-wrapper {
-        position: relative;
-        max-width: 350px;
-        width: 100%;
-    }
-
-    .search-wrapper .search-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--text-muted);
-        font-size: 1.1rem;
-    }
-
-    .search-wrapper input {
-        width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.75rem;
-        border: 1px solid var(--border);
-        border-radius: 0.5rem;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        background: var(--light);
-    }
-
-    .search-wrapper input:focus {
-        outline: none;
-        border-color: var(--primary);
-        background: white;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    /* ═════════════════════════════ TABLE STYLES ════════════════════════════ */
-    .table-responsive {
-        overflow: hidden;
-    }
-
-    .table {
-        margin: 0;
-    }
-
-    .table thead {
-        background: var(--light);
-    }
-
-    .table th {
-        padding: 1rem 1.5rem;
-        font-weight: 700;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: var(--text-muted);
-        border: none;
-        background: var(--light);
-    }
-
-    .table td {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--border);
-        vertical-align: middle;
-    }
-
-    .table tbody tr {
-        transition: all 0.3s ease;
-    }
-
-    .table tbody tr:hover {
-        background: var(--light);
-        box-shadow: inset 0 0 20px rgba(37, 99, 235, 0.05);
-    }
-
-    .table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    .table-no {
-        color: var(--text-muted);
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .table-image {
-        width: 64px;
-        height: 64px;
-        border-radius: 0.5rem;
-        object-fit: cover;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .table tbody tr:hover .table-image {
-        transform: scale(1.05);
-    }
-
-    .table-title {
-        font-weight: 700;
-        color: var(--dark);
-        font-size: 0.95rem;
-    }
-
-    .table-id {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-    }
-
-    .table-desc {
-        font-size: 0.9rem;
-        color: var(--text-muted);
-        line-height: 1.5;
-        max-width: 300px;
-    }
-
-    .table-actions {
-        display: flex;
-        justify-content: center;
-        gap: 0.75rem;
-    }
-
-    .btn-action {
-        padding: 0.55rem 1rem;
-        border-radius: 0.5rem;
-        border: none;
-        font-size: 0.85rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        text-decoration: none;
-    }
-
-    .btn-edit {
-        background: rgba(245, 158, 11, 0.15);
-        color: #b45309;
-        border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .btn-edit:hover {
-        background: var(--warning);
-        color: white;
-        border-color: var(--warning);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-    }
-
-    .btn-delete {
-        background: rgba(239, 68, 68, 0.15);
-        color: #dc2626;
-        border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-delete:hover {
-        background: var(--danger);
-        color: white;
-        border-color: var(--danger);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-action i {
-        font-size: 0.95rem;
-    }
-
-    /* ═════════════════════════════ EMPTY STATE ════════════════════════════ */
-    .empty-state {
-        padding: 4rem 2rem;
-        text-align: center;
-    }
-
-    .empty-icon {
-        font-size: 3.5rem;
-        color: var(--text-muted);
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-
-    .empty-text {
-        color: var(--text-muted);
-        font-size: 1rem;
-    }
-
-    /* ═════════════════════════════ ALERT ════════════════════════════════ */
-    .alert-success {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.05) 100%);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        color: #047857;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin: 1rem;
-        margin-bottom: 0;
-    }
-
-    .alert-success i {
-        font-size: 1.3rem;
-    }
-
-    .alert-close {
-        margin-left: auto;
-        background: none;
-        border: none;
-        color: inherit;
-        cursor: pointer;
-        font-size: 1.2rem;
-        transition: opacity 0.3s;
-    }
-
-    .alert-close:hover {
-        opacity: 0.7;
-    }
-
-    /* ═════════════════════════════ MODAL ════════════════════════════════ */
-    .modal-content {
-        border: 1px solid var(--border);
-        border-radius: 0.75rem;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    }
-
-    .modal-body {
-        padding: 2rem;
-    }
-
-    .modal-icon {
-        width: 56px;
-        height: 56px;
-        border-radius: 0.625rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin: 0 auto 1rem;
-        background: rgba(239, 68, 68, 0.15);
-        color: var(--danger);
-    }
-
-    .modal-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--dark);
-        text-align: center;
-        margin-bottom: 0.5rem;
-    }
-
-    .modal-text {
-        color: var(--text-muted);
-        text-align: center;
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
-    }
-
-    .modal-buttons {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    .btn-cancel {
-        flex: 1;
-        padding: 0.75rem;
-        background: var(--light);
-        border: 1px solid var(--border);
-        border-radius: 0.5rem;
-        color: var(--dark);
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-cancel:hover {
-        background: var(--border);
-        border-color: var(--text-muted);
-    }
-
-    .btn-confirm {
-        flex: 1;
-        padding: 0.75rem;
-        background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
-        border: none;
-        border-radius: 0.5rem;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-confirm:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-    }
-
-    /* ═════════════════════════════ FOOTER ════════════════════════════════ */
-    .table-footer {
-        padding: 1.5rem;
-        border-top: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-        background: var(--light);
-    }
-
-    .table-footer-text {
-        color: var(--text-muted);
-        font-size: 0.9rem;
-    }
-
-    /* ═════════════════════════════ RESPONSIVE ════════════════════════════════ */
     @media (max-width: 768px) {
-        .container-fluid {
-            padding: 1rem 1rem;
-        }
-
-        .header-content {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .btn-add {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .stats-section {
-            grid-template-columns: 1fr;
-        }
-
-        .table-actions {
-            flex-direction: column;
-        }
-
-        .btn-action {
-            width: 100%;
-        }
-
-        .header-title h5 {
-            font-size: 1.5rem;
-        }
-
-        .search-wrapper {
-            max-width: 100%;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .header-title h5 {
-            font-size: 1.25rem;
-        }
-
-        .table th,
-        .table td {
-            padding: 0.75rem;
-            font-size: 0.85rem;
-        }
-
-        .table-image {
-            width: 48px;
-            height: 48px;
-        }
-
-        .table-desc {
-            max-width: 150px;
-        }
-
-        .stat-text-value {
-            font-size: 1.5rem;
-        }
+        .stats-grid { grid-template-columns: 1fr; }
+        .admin-wrap { padding: 20px; }
     }
 </style>
 
-<div class="container-fluid">
+<div class="admin-wrap">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-grid"></div>
 
-    {{-- Header --}}
-    <div class="header-section">
-        <div class="header-content">
-            <div class="header-title">
-                <h5>📚 Outfit Reference Catalog</h5>
-                <small>Kelola semua referensi outfit Anda dengan mudah</small>
+    <div class="admin-inner">
+
+        {{-- ── TOPBAR ── --}}
+        <div class="topbar">
+            <div>
+                <div class="topbar-eyebrow">Visual Inventory</div>
+                <div class="topbar-title">OUTFIT <span>REFERENCE.</span></div>
             </div>
-            <a href="{{ route('admin.outfit.create') }}" class="btn-add">
-                <i class="ti ti-plus"></i>
-                <span>Tambah Referensi</span>
+            <a href="{{ route('admin.outfit.create') }}" class="btn-add-top">
+                <i class="fa fa-plus"></i> Tambah Look
             </a>
         </div>
-    </div>
 
-    {{-- Stats Cards --}}
-    <div class="stats-section">
-        <div class="stat-card">
-            <div class="stat-card-content">
-                <div class="stat-icon" style="background: rgba(37, 99, 235, 0.15); color: var(--primary);">
-                    <i class="ti ti-hanger"></i>
-                </div>
-                <div>
-                    <div class="stat-text-label">Total Referensi</div>
-                    <div class="stat-text-value">{{ $outfits->count() }}</div>
-                </div>
+        {{-- ── STATS ── --}}
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(37,99,235,0.1);color:var(--primary);"><i class="fa fa-layer-group"></i></div>
+                <div class="stat-label">Total Looks</div>
+                <div class="stat-num">{{ str_pad($outfits->count(), 2, '0', STR_PAD_LEFT) }}</div>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-content">
-                <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--success);">
-                    <i class="ti ti-circle-check"></i>
-                </div>
-                <div>
-                    <div class="stat-text-label">Outfit Aktif</div>
-                    <div class="stat-text-value">{{ $outfits->count() }}</div>
-                </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(61,220,132,0.1);color:var(--success);"><i class="fa fa-bolt"></i></div>
+                <div class="stat-label">Active References</div>
+                <div class="stat-num">{{ str_pad($outfits->count(), 2, '0', STR_PAD_LEFT) }}</div>
             </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-card-content">
-                <div class="stat-icon" style="background: rgba(6, 182, 212, 0.15); color: var(--info);">
-                    <i class="ti ti-calendar"></i>
-                </div>
-                <div>
-                    <div class="stat-text-label">Bulan Ini</div>
-                    <div class="stat-text-value">
-                        {{ $outfits->filter(fn($o) => $o->created_at->isCurrentMonth())->count() }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Table Card --}}
-    <div class="table-card">
-
-        {{-- Alert Notifikasi --}}
-        @if(session('success'))
-            <div class="alert-success">
-                <i class="ti ti-circle-check"></i>
-                <span>{{ session('success') }}</span>
-                <button type="button" class="alert-close" onclick="this.parentElement.style.display='none';">
-                    <i class="ti ti-x"></i>
-                </button>
-            </div>
-        @endif
-
-        {{-- Table Header dengan Search --}}
-        <div class="table-card-header">
-            <div class="search-wrapper">
-                <i class="ti ti-search search-icon"></i>
-                <input type="text" id="searchOutfit" placeholder="Cari outfit berdasarkan judul..." />
+            <div class="stat-card">
+                <div class="stat-icon" style="background:rgba(255,210,0,0.1);color:var(--orange);"><i class="fa fa-calendar-day"></i></div>
+                <div class="stat-label">Added This Month</div>
+                <div class="stat-num">{{ str_pad($outfits->filter(fn($o) => $o->created_at->isCurrentMonth())->count(), 2, '0', STR_PAD_LEFT) }}</div>
             </div>
         </div>
 
-        {{-- Table --}}
-        <div class="table-responsive">
-            <table class="table" id="outfitTable">
-                <thead>
-                    <tr>
-                        <th style="width: 60px;">NO</th>
-                        <th style="width: 100px;">GAMBAR</th>
-                        <th>JUDUL LOOK</th>
-                        <th>DESKRIPSI</th>
-                        <th style="width: 200px; text-align: center;">AKSI</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($outfits as $outfit)
-                    <tr class="outfit-row" data-name="{{ strtolower($outfit->judul) }}">
-                        <td class="table-no">{{ $loop->iteration }}</td>
-                        <td>
-                            <img src="{{ Storage::url($outfit->gambar) }}"
-                                 alt="{{ $outfit->judul }}"
-                                 class="table-image">
-                        </td>
-                        <td>
-                            <div class="table-title">{{ $outfit->judul }}</div>
-                            <div class="table-id">ID: #{{ $outfit->id }}</div>
-                        </td>
-                        <td>
-                            <p class="table-desc">
-                                {{ Str::limit($outfit->deskripsi, 100) }}
-                            </p>
-                        </td>
-                        <td>
-                            <div class="table-actions">
-                                <a href="{{ route('admin.outfit.edit', $outfit->id) }}"
-                                   class="btn-action btn-edit">
-                                    <i class="ti ti-edit"></i>
-                                    <span>Edit</span>
-                                </a>
-                                <button type="button"
-                                        class="btn-action btn-delete"
-                                        onclick="openDeleteModal({{ $outfit->id }}, '{{ addslashes($outfit->judul) }}')">
-                                    <i class="ti ti-trash"></i>
-                                    <span>Hapus</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5">
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <i class="ti ti-inbox"></i>
+        {{-- ── MAIN TABLE CARD ── --}}
+        <div class="table-card">
+
+            <div class="table-toolbar">
+                <div class="search-box">
+                    <i class="fa fa-search"></i>
+                    <input type="text" id="searchOutfit" placeholder="Cari judul look atau deskripsi...">
+                </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="sv-table">
+                    <thead>
+                        <tr>
+                            <th style="width:80px; text-align:center;">No</th>
+                            <th>picture</th>
+                            <th>style</th>
+                            <th>on insta </th>
+                            <th style="text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($outfits as $index => $outfit)
+                        <tr class="outfit-row" data-name="{{ strtolower($outfit->judul) }}">
+                            <td style="text-align:center; font-family:'JetBrains Mono'; color:var(--muted);">
+                                {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                            </td>
+                            <td>
+                                <img src="{{ Storage::url($outfit->gambar) }}" class="prod-img" alt="look">
+                            </td>
+                            <td>
+                                <div class="look-title">{{ $outfit->judul }}</div>
+                                <div class="look-id">REF-ID: #{{ str_pad($outfit->id, 4, '0', STR_PAD_LEFT) }}</div>
+                            </td>
+                            <td>
+                                <div class="look-desc">{{ Str::limit($outfit->deskripsi, 80) }}</div>
+                            </td>
+                            <td style="text-align:center;">
+                                <div style="display:inline-flex; gap:8px;">
+                                    <a href="{{ route('admin.outfit.edit', $outfit->id) }}" class="action-btn" title="Edit Look">
+                                        <i class="fa fa-pen-nib"></i>
+                                    </a>
+                                    <button onclick="openDeleteModal({{ $outfit->id }}, '{{ addslashes($outfit->judul) }}')" class="action-btn danger" title="Delete">
+                                        <i class="fa fa-trash-can"></i>
+                                    </button>
                                 </div>
-                                <p class="empty-text">Belum ada referensi outfit. Mulai buat dengan mengklik tombol "Tambah Referensi"</p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding:60px; color:var(--muted);">
+                                <i class="fa fa-folder-open" style="font-size:40px; opacity:0.2; margin-bottom:15px; display:block;"></i>
+                                <p>Belum ada referensi outfit yang disimpan.</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        {{-- Table Footer --}}
-        <div class="table-footer">
-            <span class="table-footer-text">
-                Menampilkan <strong>{{ $outfits->count() }}</strong> referensi outfit
-            </span>
-            @if(method_exists($outfits, 'links'))
-                {{ $outfits->links('pagination::bootstrap-5') }}
-            @endif
-        </div>
-
     </div>
 </div>
 
-{{-- Modal Hapus --}}
-<div class="modal fade" id="deleteModal" tabindex="-1" backdrop="static">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
-        <div class="modal-content">
-            <div class="modal-body">
-                <div class="modal-icon">
-                    <i class="ti ti-trash"></i>
+{{-- Modal Hapus (Modern Style) --}}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius:24px; border:none; overflow:hidden;">
+            <div class="modal-body" style="padding:40px; text-align:center;">
+                <div style="width:80px; height:80px; background:rgba(255,92,92,0.1); color:var(--danger); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; margin:0 auto 24px;">
+                    <i class="fa fa-triangle-exclamation"></i>
                 </div>
-                <h6 class="modal-title">Hapus Referensi Outfit?</h6>
-                <p class="modal-text">
-                    Outfit <strong id="deleteName"></strong> akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
-                </p>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-cancel" data-bs-dismiss="modal">
-                        Batal
-                    </button>
-                    <form id="deleteForm" method="POST" style="flex: 1;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn-confirm w-100">
-                            Ya, Hapus
-                        </button>
+                <h3 style="font-family:'Bebas Neue'; letter-spacing:1px; font-size:28px;">Hapus Referensi?</h3>
+                <p style="color:var(--muted); margin-bottom:32px;">Look <strong id="deleteName"></strong> akan dihapus permanen dari StreetVibe.</p>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="padding:12px; border-radius:12px; background:var(--card-2); font-weight:700;">Batal</button>
+                    <form id="deleteForm" method="POST">
+                        @csrf @method('DELETE')
+                        <button type="submit" style="width:100%; padding:12px; border-radius:12px; background:var(--danger); color:white; border:none; font-weight:700;">Ya, Hapus</button>
                     </form>
                 </div>
             </div>
@@ -746,31 +258,20 @@
 </div>
 
 <script>
-    // Search functionality
-    document.getElementById('searchOutfit').addEventListener('input', function () {
-        const query = this.value.toLowerCase();
+    // Live Search
+    document.getElementById('searchOutfit').addEventListener('input', function() {
+        const q = this.value.toLowerCase();
         document.querySelectorAll('.outfit-row').forEach(row => {
-            const matches = row.dataset.name.includes(query);
-            row.style.display = matches ? '' : 'none';
+            row.style.display = row.dataset.name.includes(q) ? '' : 'none';
         });
     });
 
-    // Delete modal handler
+    // Modal Handler
     function openDeleteModal(id, name) {
         document.getElementById('deleteName').textContent = name;
-        document.getElementById('deleteForm').action = '{{ route("admin.outfit.destroy", ":id") }}'.replace(':id', id);
-        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-        modal.show();
+        document.getElementById('deleteForm').action = `{{ url('admin/outfit') }}/${id}`;
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
     }
-
-    // Auto-hide alerts
-    document.querySelectorAll('.alert-success').forEach(alert => {
-        setTimeout(() => {
-            alert.style.opacity = '0';
-            alert.style.transition = 'opacity 0.3s ease';
-            setTimeout(() => alert.remove(), 300);
-        }, 4000);
-    });
 </script>
 
 @endsection
