@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // <--- WAJIB ADA \Admin
+namespace App\Http\Controllers\Admin; // Pastikan ini ada \Admin
 
 use App\Http\Controllers\Controller;
 use App\Models\GalleryPhoto;
@@ -9,28 +9,41 @@ use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
-    // API untuk Flutter
+    /**
+     * FUNGSI UNTUK API (Flutter/Postman)
+     * Tanpa Middleware Auth
+     */
     public function getGalleryApi()
     {
-        $photos = GalleryPhoto::orderBy('urutan', 'asc')->get()->map(function($photo) {
-            return [
-                'id'       => $photo->id,
-                'caption'  => $photo->caption,
-                'foto_url' => asset('storage/' . $photo->foto),
-            ];
-        });
+        try {
+            $photos = GalleryPhoto::orderBy('urutan', 'asc')->get()->map(function($photo) {
+                return [
+                    'id'       => $photo->id,
+                    'caption'  => $photo->caption,
+                    // asset() menghasilkan URL lengkap http://127.0.0.1:8000/storage/...
+                    'foto_url' => asset('storage/' . $photo->foto),
+                ];
+            });
 
-        return response()->json([
-            'status' => 'success',
-            'data'   => $photos
-        ], 200);
+            return response()->json([
+                'status' => 'success',
+                'data'   => $photos
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    // Tampilan Web Admin
+    /**
+     * FUNGSI UNTUK WEB ADMIN
+     */
     public function index()
     {
         $photos = GalleryPhoto::orderBy('urutan', 'asc')->get();
-        return view('gallery', compact('photos')); // Pastikan file blade ada di resources/views/gallery.blade.php
+        return view('gallery', compact('photos'));
     }
 
     public function store(Request $request)

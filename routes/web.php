@@ -10,6 +10,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\OutfitController as AdminOutfitController;
+
+// (FIXED) Mengarahkan kembali ke folder Admin
 use App\Http\Controllers\Admin\GalleryController;
 
 // Models
@@ -24,7 +26,7 @@ use App\Models\GalleryPhoto;
 */
 Route::get('/', function () {
     $products = Product::latest()->take(8)->get();
-    $galleryPhotos = GalleryPhoto::orderBy('urutan', 'asc')->latest()->get();
+    $galleryPhotos = GalleryPhoto::orderBy('urutan', 'asc')->get();
 
     return view('welcome', compact('products', 'galleryPhotos'));
 })->name('welcome');
@@ -34,20 +36,14 @@ Route::get('/', function () {
 | 2. USER AREA
 |--------------------------------------------------------------------------
 */
-
-// Produk (USER)
 Route::get('/products', [ProductController::class, 'showKategori'])->name('user.products');
-
-// Detail Produk
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 
-// Outfit Gallery
 Route::get('/outfits-gallery', function () {
     $outfits = Outfit::with('products')->latest()->get();
     return view('Outfit', compact('outfits'));
 })->name('user.outfits.index');
 
-// Cart
 Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/add/{id}', 'add')->name('add');
@@ -56,11 +52,10 @@ Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(f
 
 /*
 |--------------------------------------------------------------------------
-| 3. AUTH
+| 3. AUTH (Login/Register Web)
 |--------------------------------------------------------------------------
 */
 Auth::routes();
-
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 /*
@@ -70,19 +65,12 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 */
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
 
-    // Produk
     Route::resource('products', ProductController::class);
-
-    // Kategori
     Route::resource('categories', CategoryController::class);
-
-    // Brand
     Route::resource('brands', BrandController::class);
-
-    // Outfit
     Route::resource('outfit', AdminOutfitController::class);
 
-    // Gallery
+    // (FIXED) Sudah otomatis merujuk ke App\Http\Controllers\Admin\GalleryController
     Route::controller(GalleryController::class)->prefix('gallery')->name('gallery.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');

@@ -47,6 +47,7 @@
                             <option value="baju" {{ $product->kategori == 'baju' ? 'selected' : '' }}>baju</option>
                             <option value="celana" {{ $product->kategori == 'celana' ? 'selected' : '' }}>celana</option>
                             <option value="sepatu" {{ $product->kategori == 'sepatu' ? 'selected' : '' }}>sepatu</option>
+                             <option value="jacket" {{ $product->kategori == 'jacket' ? 'selected' : '' }}>jacket</option>
                         </select>
                         <small class="text-muted">Gunakan untuk filter menu Navbar</small>
                     </div>
