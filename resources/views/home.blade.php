@@ -556,10 +556,6 @@
                     <span class="live-dot"></span>
                     <span id="live-time">--:--:--</span>
                 </div>
-                <a href="{{ route('admin.products.create') }}" class="btn-add">
-                    <span class="btn-add-icon"><i class="fa fa-plus"></i></span>
-                    Add Product
-                </a>
             </div>
         </div>
 
@@ -637,7 +633,7 @@
                             <th>Brand</th>
                             <th>Price</th>
                             <th>Status</th>
-                            <th style="text-align:center;">Actions</th>
+
                         </tr>
                     </thead>
                     <tbody id="productTableBody">
@@ -686,23 +682,7 @@
                                 </span>
                             </td>
 
-                            <td style="text-align:center;">
-                                <div style="display:inline-flex;gap:6px;">
-                                    <a href="{{ route('admin.products.show', $p->id) }}" class="action-btn" title="View">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('admin.products.edit', $p->id) }}" class="action-btn" title="Edit">
-                                        <i class="fa fa-pen-to-square"></i>
-                                    </a>
-                                    <form method="POST" action="{{ route('admin.products.destroy', $p->id) }}"
-                                          onsubmit="return confirm('Delete this product?')" style="display:inline;">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="action-btn danger" title="Delete">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+
                         </tr>
                         @empty
                         <tr>
@@ -726,7 +706,7 @@
                     </button>
                     <div id="pageNumbers" style="display:flex;gap:4px;"></div>
                     <button class="pag-btn" id="nextBtn" onclick="changePage(1)">
-                        <i class="fa fa-chevron-right" style="font-size:10px;"></i>
+
                     </button>
                 </div>
             </div>
