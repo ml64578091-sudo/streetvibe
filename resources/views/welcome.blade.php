@@ -645,22 +645,32 @@
 <div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
 
+
+
 <!-- ═══════════════════════════════════════ NAVBAR ═══════════════════════════════════════ -->
 <nav class="sv-nav" id="svNav">
     <a href="{{ url('/') }}" class="sv-logo">STREET<span>VIBE.</span></a>
+
     <ul class="sv-nav-links">
         <li><a href="#products-section">Produk</a></li>
         <li><a href="#lookbook">Lookbook</a></li>
         <li><a href="{{ route('user.outfits.index') }}">Outfits</a></li>
         <li><a href="#gallery">Instagram</a></li>
     </ul>
-    <a href="{{ route('cart.index') }}" class="sv-cart-btn">
-        <span class="lnr lnr-cart"></span>
-        @php $cart = session('cart'); @endphp
-        @if($cart && count($cart) > 0)
-            <span class="cart-badge">{{ count($cart) }}</span>
-        @endif
-    </a>
+
+    <div class="sv-nav-actions">
+        <a href="{{ url('/profile') }}" class="sv-nav-icon" title="Profil Saya">
+            <span class="lnr lnr-user"></span>
+        </a>
+
+        <a href="{{ route('cart.index') }}" class="sv-cart-btn">
+            <span class="lnr lnr-cart"></span>
+            @php $cart = session('cart'); @endphp
+            @if($cart && count($cart) > 0)
+                <span class="cart-badge">{{ count($cart) }}</span>
+            @endif
+        </a>
+    </div>
 </nav>
 
 <!-- ALERT -->
@@ -811,6 +821,60 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
 <style>
+
+
+
+/* Container untuk aksi di kanan */
+.sv-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Jarak antar ikon */
+}
+
+/* Styling dasar ikon (User & Cart) */
+.sv-nav-icon, .sv-cart-btn {
+    color: #1a1a1a;
+    text-decoration: none;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Efek Hover: Sedikit naik dan berubah warna */
+.sv-nav-icon:hover, .sv-cart-btn:hover {
+    color: #ff4757; /* Ganti dengan warna aksen brandmu */
+    transform: translateY(-2px);
+}
+
+/* Penyesuaian Badge Keranjang agar tetap rapi */
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #ff4757;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-weight: bold;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* Responsive: Pastikan di mobile tetap rapi */
+@media (max-width: 768px) {
+    .sv-nav-links {
+        display: none; /* Jika kamu menggunakan menu burger untuk link utama */
+    }
+
+    .sv-nav-actions {
+        gap: 1rem;
+    }
+}
+
+
 .hero {
     min-height: 100vh;
     display: flex;

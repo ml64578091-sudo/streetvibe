@@ -124,7 +124,10 @@
         .spec-label { display: block; font-size: 11px; font-weight: 700; color: var(--grey-500); text-transform: uppercase; margin-bottom: 5px; }
         .spec-value { font-weight: 800; font-size: 15px; }
 
-        .description-text { font-size: 16px; line-height: 1.8; color: var(--grey-500); margin-bottom: 50px; }
+        /* Deskripsi Styling */
+        .description-text { font-size: 16px; line-height: 1.8; color: var(--grey-500); margin-bottom: 50px; text-align: justify; }
+        .desc-line { margin-bottom: 12px; display: block; }
+        .desc-bullet { display: flex; gap: 10px; margin-bottom: 8px; padding-left: 5px; }
 
         /* ─── BUTTONS ─── */
         .btn-primary-sv {
@@ -150,7 +153,6 @@
         .btn-wa-sv { border-color: var(--wa); color: var(--wa) !important; }
         .btn-wa-sv:hover { background: var(--wa); color: white !important; }
 
-        /* ─── NOISE ─── */
         .noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.3; }
 
         @media (max-width: 991px) {
@@ -207,12 +209,19 @@
             </div>
 
             <div class="spec-grid">
+                {{-- LOGIKA 3 STATUS: READY, SALE, SOLD --}}
                 <div class="spec-item">
                     <span class="spec-label">Inventory Status</span>
-                    <span class="spec-value" style="color: {{ $product->stok > 0 ? 'var(--wa)' : '#ff3e3e' }}">
-                        {{ $product->stok > 0 ? 'AVAILABLE' : 'SOLD OUT' }}
-                    </span>
+                    @php $status = strtolower($product->status); @endphp
+                    @if($status === 'ready')
+                        <span class="spec-value" style="color: #2ed573;"><i class="fa fa-check-circle"></i> READY STOCK</span>
+                    @elseif($status === 'sale' || $status === 'on sale')
+                        <span class="spec-value" style="color: #FFD200;"><i class="fa fa-bolt"></i> ON SALE</span>
+                    @else
+                        <span class="spec-value" style="color: #ff3e3e;"><i class="fa fa-times-circle"></i> SOLD OUT</span>
+                    @endif
                 </div>
+
                 <div class="spec-item">
                     <span class="spec-label">Units Left</span>
                     <span class="spec-value">{{ $product->stok }} PCS</span>
@@ -227,8 +236,23 @@
                 </div>
             </div>
 
+            {{-- LOGIKA AUTO-FORMAT DESKRIPSI --}}
             <div class="description-text">
-                {!! nl2br(e($product->deskripsi)) !!}
+                @php
+                    $descLines = explode("\n", e($product->deskripsi));
+                @endphp
+                @foreach($descLines as $line)
+                    @if(trim($line) != '')
+                        @if(str_starts_with(trim($line), '-') || str_starts_with(trim($line), '*'))
+                            <div class="desc-bullet">
+                                <span style="color: var(--orange);">•</span>
+                                <span>{{ ltrim(trim($line), '-* ') }}</span>
+                            </div>
+                        @else
+                            <span class="desc-line">{{ $line }}</span>
+                        @endif
+                    @endif
+                @endforeach
             </div>
 
             <div class="action-stack">
@@ -240,30 +264,20 @@
                     </button>
                 </form>
 
-                <div class="social-actions">
+                <div class="social-actions" style="margin-top: 15px; display: flex; gap: 10px;">
                     @php
                         $shopeeUrl = "https://shopee.co.id/search?keyword=" . urlencode($product->nama_produk);
                         $waNumber = "6283140760412";
-                        $waText = "🔥 *STREETVIBE ORDER FORM* 🔥\n\n" .
-                                  "I'm interested in this drop:\n" .
-                                  "━━━━━━━━━━━━━━━━\n" .
-                                  "📦 *ITEM:* " . strtoupper($product->nama_produk) . "\n" .
-                                  "💰 *PRICE:* IDR " . number_format($product->harga, 0, ',', '.') . "\n" .
-                                  "🆔 *REF:* SV-" . str_pad($product->id, 4, '0', STR_PAD_LEFT) . "\n" .
-                                  "━━━━━━━━━━━━━━━━\n\n" .
-                                  "*SHIPPING DATA*\n" .
-                                  "• Name:\n" .
-                                  "• Phone:\n" .
-                                  "• Address:\n\n" .
-                                  "Is this still available for checkout?";
+                        $waText = "🔥 *STREETVIBE ORDER FORM* 🔥\n\n📦 *ITEM:* " . strtoupper($product->nama_produk) . "\n💰 *PRICE:* IDR " . number_format($product->harga, 0, ',', '.') . "\n\nIs this still available?";
                         $waUrl = "https://wa.me/" . $waNumber . "?text=" . urlencode($waText);
                     @endphp
 
-                    <a href="{{ $shopeeUrl }}" target="_blank" class="btn-outline btn-shopee-sv">
-                        <i class="fa fa-shopping-bag"></i> SHOPEE
+                    <a href="{{ $waUrl }}" target="_blank" class="btn-outline btn-wa-sv" style="flex: 1;">
+                        <i class="fa fa-whatsapp"></i><span>WHATSAPP</span>
                     </a>
-                    <a href="{{ $waUrl }}" target="_blank" class="btn-outline btn-wa-sv">
-                        <i class="fa fa-whatsapp"></i> WHATSAPP
+
+                    <a href="{{ $shopeeUrl }}" target="_blank" class="btn-outline btn-shopee-sv" style="flex: 1;">
+                        <i class="fa fa-shopping-bag"></i><span>SHOPEE</span>
                     </a>
                 </div>
             </div>
@@ -278,33 +292,20 @@
 
 <script src="{{ asset('user/js/vendor/jquery-2.2.4.min.js') }}"></script>
 <script>
-    /* ── CURSOR LOGIC ── */
+    /* ── CURSOR ── */
     const dot = document.getElementById('cDot');
     const ring = document.getElementById('cRing');
     let mX = 0, mY = 0, rX = 0, rY = 0;
-
     document.addEventListener('mousemove', e => {
         mX = e.clientX; mY = e.clientY;
         dot.style.left = `${mX}px`; dot.style.top = `${mY}px`;
     });
-
     function lerp() {
         rX += (mX - rX) * 0.15; rY += (mY - rY) * 0.15;
         ring.style.left = `${rX}px`; ring.style.top = `${rY}px`;
         requestAnimationFrame(lerp);
     }
     lerp();
-
-    document.querySelectorAll('a, button, .main-image-card').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            ring.style.width = '60px'; ring.style.height = '60px';
-            ring.style.background = 'rgba(255, 92, 0, 0.1)'; ring.style.borderColor = 'transparent';
-        });
-        el.addEventListener('mouseleave', () => {
-            ring.style.width = '35px'; ring.style.height = '35px';
-            ring.style.background = 'transparent'; ring.style.borderColor = 'var(--orange)';
-        });
-    });
 
     /* ── ZOOM ── */
     const panel = document.getElementById('imgPanel');
@@ -318,16 +319,13 @@
     });
     panel.addEventListener('mouseleave', () => img.style.transform = 'scale(1)');
 
-    /* ── THEME ── */
     function toggleDarkMode() {
         document.body.classList.toggle('dark');
         localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     }
-
     window.addEventListener('scroll', () => {
         document.getElementById('svNav').classList.toggle('scrolled', window.scrollY > 50);
     });
-
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
 </script>
 

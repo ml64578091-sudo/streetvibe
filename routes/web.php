@@ -19,7 +19,7 @@ use App\Models\GalleryPhoto;
 
 /*
 |--------------------------------------------------------------------------
-| 1. HALAMAN UTAMA (FREE)
+| 1. HALAMAN UTAMA (PUBLIC)
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
@@ -37,6 +37,11 @@ Route::get('/', function () {
 */
 Route::middleware(['auth'])->group(function () {
 
+    // PROFILE
+    Route::get('/profile', function () {
+        return view('profile', ['user' => Auth::user()]);
+    })->name('profile');
+
     Route::get('/products', [ProductController::class, 'showKategori'])->name('user.products');
     Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 
@@ -45,38 +50,44 @@ Route::middleware(['auth'])->group(function () {
         return view('Outfit', compact('outfits'));
     })->name('user.outfits.index');
 
-    // CART (WAJIB LOGIN)
+    // CART
     Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/add/{id}', 'add')->name('add');
         Route::post('/remove', 'remove')->name('remove');
     });
-
 });
 
 
 /*
 |--------------------------------------------------------------------------
-| 3. AUTH
+| 3. AUTHENTICATION & REDIRECT LOGIC
 |--------------------------------------------------------------------------
 */
 Auth::routes();
 
-Route::get('/home', [HomeController::class, 'index'])
-    ->middleware('auth')
-    ->name('home');
+// MODIFIKASI DISINI:
+// Jika user biasa mencoba akses /home, mereka akan diarahkan ke profil atau welcome
+// Jika admin, mereka bisa diarahkan ke dashboard admin
+Route::get('/home', function() {
+    if (Auth::user()->role == 'admin') {
+        return redirect()->route('admin.products.index');
+    }
+    return redirect()->route('profile');
+})->middleware('auth')->name('home');
 
 
 /*
 |--------------------------------------------------------------------------
-| 4. ADMIN AREA (ADMIN ONLY)
+| 4. ADMIN AREA (HANYA ADMIN)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'isAdmin'])
+Route::middleware(['auth', 'isAdmin']) // Middleware 'isAdmin' harus terdaftar di Kernel.php
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
+        // User biasa yang mencoba akses link /admin/... akan kena 403 Forbidden atau mental balik
         Route::resource('products', ProductController::class);
         Route::resource('categories', CategoryController::class);
         Route::resource('brands', BrandController::class);

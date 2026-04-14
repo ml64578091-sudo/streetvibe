@@ -6,17 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    // Masukkan semua kolom yang boleh diisi (Fillable)
     protected $fillable = [
         'nama_produk',
         'harga',
         'deskripsi',
         'category_id',
-        'kategori',
         'brand_id',
+        'stok',        // WAJIB ADA agar stok bisa tersimpan ke database
         'status',
         'gambar',
-        'link_shopee' // Tambahkan ini jika sudah migrasi tadi
+        
+    ];
+
+    // Tambahkan ini agar Laravel otomatis mengubah stok menjadi angka (integer)
+    protected $casts = [
+        'stok' => 'integer',
+        'harga' => 'integer',
     ];
 
     // Relasi ke Kategori
@@ -31,10 +36,9 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    // RELASI KE OUTFITS (Cukup tulis SATU KALI saja)
+    // Relasi ke Outfits
     public function outfits()
     {
-        // Gunakan tabel perantara 'outfit_product'
         return $this->belongsToMany(Outfit::class, 'outfit_product');
     }
 }
