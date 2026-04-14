@@ -10,8 +10,6 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\OutfitController as AdminOutfitController;
-
-// (FIXED) Mengarahkan kembali ke folder Admin
 use App\Http\Controllers\Admin\GalleryController;
 
 // Models
@@ -21,7 +19,7 @@ use App\Models\GalleryPhoto;
 
 /*
 |--------------------------------------------------------------------------
-| 1. HALAMAN UTAMA
+| 1. HALAMAN UTAMA (FREE)
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
@@ -31,51 +29,67 @@ Route::get('/', function () {
     return view('welcome', compact('products', 'galleryPhotos'));
 })->name('welcome');
 
+
 /*
 |--------------------------------------------------------------------------
-| 2. USER AREA
+| 2. USER AREA (WAJIB LOGIN)
 |--------------------------------------------------------------------------
 */
-Route::get('/products', [ProductController::class, 'showKategori'])->name('user.products');
-Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+Route::middleware(['auth'])->group(function () {
 
-Route::get('/outfits-gallery', function () {
-    $outfits = Outfit::with('products')->latest()->get();
-    return view('Outfit', compact('outfits'));
-})->name('user.outfits.index');
+    Route::get('/products', [ProductController::class, 'showKategori'])->name('user.products');
+    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 
-Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
-    Route::get('/', 'index')->name('index');
-    Route::post('/add/{id}', 'add')->name('add');
-    Route::post('/remove', 'remove')->name('remove');
+    Route::get('/outfits-gallery', function () {
+        $outfits = Outfit::with('products')->latest()->get();
+        return view('Outfit', compact('outfits'));
+    })->name('user.outfits.index');
+
+    // CART (WAJIB LOGIN)
+    Route::controller(CartController::class)->prefix('cart')->name('cart.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/add/{id}', 'add')->name('add');
+        Route::post('/remove', 'remove')->name('remove');
+    });
+
 });
+
 
 /*
 |--------------------------------------------------------------------------
-| 3. AUTH (Login/Register Web)
+| 3. AUTH
 |--------------------------------------------------------------------------
 */
 Auth::routes();
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+Route::get('/home', [HomeController::class, 'index'])
+    ->middleware('auth')
+    ->name('home');
+
 
 /*
 |--------------------------------------------------------------------------
-| 4. ADMIN AREA
+| 4. ADMIN AREA (ADMIN ONLY)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'isAdmin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    Route::resource('products', ProductController::class);
-    Route::resource('categories', CategoryController::class);
-    Route::resource('brands', BrandController::class);
-    Route::resource('outfit', AdminOutfitController::class);
+        Route::resource('products', ProductController::class);
+        Route::resource('categories', CategoryController::class);
+        Route::resource('brands', BrandController::class);
+        Route::resource('outfit', AdminOutfitController::class);
 
-    // (FIXED) Sudah otomatis merujuk ke App\Http\Controllers\Admin\GalleryController
-    Route::controller(GalleryController::class)->prefix('gallery')->name('gallery.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::post('/', 'store')->name('store');
-        Route::delete('/{id}', 'destroy')->name('destroy');
-        Route::post('/{id}/up', 'moveUp')->name('moveUp');
-        Route::post('/{id}/down', 'moveDown')->name('moveDown');
+        Route::controller(GalleryController::class)
+            ->prefix('gallery')
+            ->name('gallery.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::delete('/{id}', 'destroy')->name('destroy');
+                Route::post('/{id}/up', 'moveUp')->name('moveUp');
+                Route::post('/{id}/down', 'moveDown')->name('moveDown');
+            });
     });
-});

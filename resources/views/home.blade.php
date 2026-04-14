@@ -545,7 +545,6 @@
         {{-- ── TOP BAR ── --}}
         <div class="topbar">
             <div class="topbar-left">
-                <div class="topbar-eyebrow">
                     <span class="eyebrow-line"></span>
                     Products Control
                 </div>
@@ -555,7 +554,6 @@
                 <div class="topbar-time">
                     <span class="live-dot"></span>
                     <span id="live-time">--:--:--</span>
-                </div>
             </div>
         </div>
 
